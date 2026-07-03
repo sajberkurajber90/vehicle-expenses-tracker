@@ -1,0 +1,9 @@
+packages:
+  # executable/launchable applications
+  - 'apps/*'
+  # all packages in subdirs of packages/ and components/
+  - 'packages/*'
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  unrs-resolver: true
