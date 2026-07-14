@@ -1,7 +1,18 @@
 node_modules
-dist
-build
-.nuxt/
-.output/
-*.log
 .env
+!.env.example
+.idea/
+# Nuxt related
+build
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+# Misc
+.DS_Store
+.fleet
+
+# proxy
+docker/dev/cert/*

@@ -1,0 +1,32 @@
+services:
+  reverse-proxy:
+    image: nginx:1.29.0-alpine
+    container_name: "vet-reverse-proxy"
+    ports:
+      - "80:80"
+      - "${PROXY_PORT}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./cert:/etc/nginx/ssl:ro"
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api-core/Dockerfile.dev
+    container_name: "vet-api"
+    ports:
+      - "${API_PORT}:3000"
+    depends_on:
+      - reverse-proxy
+    develop:
+      watch:
+        - action: sync
+          path: apps/api-core/src
+          target: /app/apps/api-core/src
+          ignore:
+            - node_modules
+        - action: rebuild
+          path: apps/api-core/package.json
+        - action: rebuild
+          path: apps/api-core/tsconfig.json
+        - action: rebuild
+          path: apps/api-core/nodemon.json

@@ -1,0 +1,28 @@
+# node dev
+FROM node:26-alpine3.22
+
+# install nodemon globally
+RUN npm install --global nodemon
+
+# pnpm install
+RUN npm install -g pnpm@11.9.0
+
+# create user - and working dir
+RUN addgroup app && adduser -S -G app app
+WORKDIR /app
+
+# copy from source to working dir
+COPY package.json tsconfig.base.json pnpm-lock.yaml pnpm-workspace.yaml /app/
+COPY apps/api-core/package.json apps/api-core/tsconfig.json apps/api-core/nodemon.json /app/apps/api-core/
+
+
+
+# select and set user
+RUN chown -R app:app /app
+USER app
+
+# install dependencies
+RUN pnpm install --frozen-lockfile
+
+# run app
+CMD ["pnpm", "--filter", "api-core", "start:dev"]
