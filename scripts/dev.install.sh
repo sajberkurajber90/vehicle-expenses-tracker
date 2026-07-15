@@ -5,20 +5,7 @@ sudo -v
 ENV_FILE="../.env"
 NODE_MODULES_DIR="../node_modules"
 CERT_DIR="../docker/dev/cert"
-
-# Make sure the mkcert is installed
-MKCERT_PATH=$(command -v mkcert 2>/dev/null)
-if [ -z "$MKCERT_PATH" ]; then
-  echo "Error: mkcert is not installed" >&2
-  exit 1
-fi
-
-# Make sure the pnpm is installed
-PNPM_PATH=$(command -v pnpm 2>/dev/null)
-if [ -z "$PNPM_PATH" ]; then
-  echo "Error: pnpm is not installed" >&2
-  exit 1
-fi
+LOCAL_DOMAIN=127.0.0.1
 
 # Load environment variables from .env file
 if [ -f "$ENV_FILE" ]; then
@@ -33,29 +20,46 @@ else
   exit 1
 fi
 
+# pre-checks
+# Make sure the mkcert is installed
+MKCERT_PATH=$(command -v mkcert 2>/dev/null)
+if [ -z "$MKCERT_PATH" ]; then
+  echo "Error: mkcert is not installed" >&2
+  exit 1
+fi
+
+# Make sure the pnpm is installed
+PNPM_PATH=$(command -v pnpm 2>/dev/null)
+if [ -z "$PNPM_PATH" ]; then
+  echo "Error: pnpm is not installed" >&2
+  exit 1
+fi
 
 # cert folder existing and the cert files existing
 if [ ! -d "$CERT_DIR" ] || [[ -z "$(ls "$CERT_DIR"/*.pem 2>/dev/null)" ]]; then
   mkdir -p "$CERT_DIR"
   echo "Generating self-signed certificate..."
-  mkcert "*.$PROXY_BASE_URL"
-  mv "./_wildcard.$PROXY_BASE_URL.pem" "$CERT_DIR"
-  mv "./_wildcard.$PROXY_BASE_URL-key.pem" "$CERT_DIR"
+  mkcert "$PROXY_BASE_URL" "*.$PROXY_BASE_URL"
+  mv "./$PROXY_BASE_URL+1.pem" "$CERT_DIR"
+  mv "./$PROXY_BASE_URL+1-key.pem" "$CERT_DIR"
+  # TODO: chmod the cert files to be readable by nginx 644
 else
   echo "Cert folder and cert files already exist. Skipping cert generation."
 fi
 
 # check if domaine exists - add domain to etc/host
 mapfile -t DOMAIN_PREFIXES < <(grep -E '^[^=]+_PREFIX=' $ENV_FILE | grep -v '^#' | cut -d'=' -f2)
+# root domain
 if ! grep -q "$PROXY_BASE_URL" /etc/hosts; then
   echo "Adding $PROXY_BASE_URL to /etc/hosts"
-  echo "127.0.0.11 $PROXY_BASE_URL" | sudo tee -a /etc/hosts
+  echo "$LOCAL_DOMAIN $PROXY_BASE_URL" | sudo tee -a /etc/hosts
 fi
+# subdomains
 for PREFIX in "${DOMAIN_PREFIXES[@]}"; do
   DOMAIN="$PREFIX.$PROXY_BASE_URL"
   if ! grep -q "$DOMAIN" /etc/hosts; then
     echo "Adding $DOMAIN to /etc/hosts"
-    echo "127.0.0.11 $DOMAIN" | sudo tee -a /etc/hosts
+    echo "$LOCAL_DOMAIN $DOMAIN" | sudo tee -a /etc/hosts
   fi
 done
 
@@ -68,4 +72,5 @@ fi
 
 # TODO: generate nginx.conf file for reverse proxy
 
-# run docker compose up -d
+# run docker compose
+#docker compose -f docker/dev/docker-compose.dev.yaml --env-file .env watch

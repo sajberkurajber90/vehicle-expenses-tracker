@@ -1,3 +1,4 @@
+name: vehicle-expenses-tracker
 services:
   reverse-proxy:
     image: nginx:1.29.0-alpine
@@ -6,8 +7,8 @@ services:
       - "80:80"
       - "${PROXY_PORT}:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./cert:/etc/nginx/ssl:ro"
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./cert:/etc/nginx/ssl:ro
   api:
     build:
       context: ../..
@@ -20,13 +21,9 @@ services:
     develop:
       watch:
         - action: sync
-          path: apps/api-core/src
+          path: ../../apps/api-core/src
           target: /app/apps/api-core/src
           ignore:
             - node_modules
         - action: rebuild
-          path: apps/api-core/package.json
-        - action: rebuild
-          path: apps/api-core/tsconfig.json
-        - action: rebuild
-          path: apps/api-core/nodemon.json
+          path: ../../pnpm-lock.yaml
