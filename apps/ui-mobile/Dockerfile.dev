@@ -1,0 +1,23 @@
+# node dev
+FROM node:26-alpine3.22
+
+# pnpm install
+RUN npm install -g pnpm@11.9.0
+
+# create user - and working dir
+RUN addgroup app && adduser -S -G app app
+WORKDIR /app
+
+# copy from source to working dir
+COPY package.json tsconfig.base.json pnpm-lock.yaml pnpm-workspace.yaml /app/
+COPY apps/ui-mobile/ /app/apps/ui-mobile/
+
+# select and set user
+RUN chown -R app:app /app
+USER app
+
+# install dependencies
+RUN pnpm install --frozen-lockfile
+
+# run app
+CMD ["pnpm", "--filter", "ui-mobile", "dev"]

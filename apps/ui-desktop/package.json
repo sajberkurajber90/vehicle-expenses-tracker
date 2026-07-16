@@ -1,5 +1,5 @@
 {
-  "name": "ui-core",
+  "name": "ui-desktop",
   "type": "module",
   "private": true,
   "scripts": {

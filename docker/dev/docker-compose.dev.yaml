@@ -14,8 +14,6 @@ services:
       context: ../..
       dockerfile: apps/api-core/Dockerfile.dev
     container_name: "vet-api"
-    ports:
-      - "${API_PORT}:3000"
     depends_on:
       - reverse-proxy
     develop:
@@ -23,7 +21,46 @@ services:
         - action: sync
           path: ../../apps/api-core/src
           target: /app/apps/api-core/src
-          ignore:
-            - node_modules
         - action: rebuild
           path: ../../pnpm-lock.yaml
+  ui-desktop:
+#    environment:
+    build:
+      context: ../..
+      dockerfile: apps/ui-desktop/Dockerfile.dev
+    container_name: "vet-ui-desktop"
+    depends_on:
+      - reverse-proxy
+      - api
+    develop:
+        watch:
+          - action: sync
+            path: ../../apps/ui-desktop/
+            target: /app/apps/ui-desktop
+            ignore:
+              - node_modules
+              - Dockerfile.dev
+              - README.md
+              - .nuxt
+          - action: rebuild
+            path: ../../pnpm-lock.yaml
+  ui-mobile:
+    build:
+      context: ../..
+      dockerfile: apps/ui-mobile/Dockerfile.dev
+    container_name: "vet-ui-mobile"
+    depends_on:
+      - reverse-proxy
+      - api
+    develop:
+        watch:
+          - action: sync
+            path: ../../apps/ui-mobile/
+            target: /app/apps/ui-mobile
+            ignore:
+              - node_modules
+              - Dockerfile.dev
+              - README.md
+              - .nuxt
+          - action: rebuild
+            path: ../../pnpm-lock.yaml

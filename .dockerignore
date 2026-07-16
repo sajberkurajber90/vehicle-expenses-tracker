@@ -1,0 +1,4 @@
+apps/*/node_modules
+apps/*/Dockerfile.*
+apps/*/README.md
+apps/*/.nuxt
