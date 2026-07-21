@@ -13,5 +13,16 @@
     "ts-node": "^10.9.2",
     "nodemon": "^3.1.14",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "better-auth": "^1.6.23",
+    "zod": "^3.21.4",
+    "fastify": "^5.8.5",
+    "dotenv": "^17.2.0",
+    "mysql2": "^3.22.3",
+    "kysely": "^0.28.17",
+    "redis": "^5.8.2",
+    "meilisearch": "^0.51.0",
+    "nodemailer": "^8.0.7"
   }
 }

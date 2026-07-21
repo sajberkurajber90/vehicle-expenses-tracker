@@ -3,6 +3,10 @@ services:
   reverse-proxy:
     image: nginx:1.29.0-alpine
     container_name: "vet-reverse-proxy"
+    depends_on:
+      - api
+      - ui-desktop
+      - ui-mobile
     ports:
       - "80:80"
       - "${PROXY_PORT}:443"
@@ -10,12 +14,13 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./cert:/etc/nginx/ssl:ro
   api:
+    # environment:
     build:
       context: ../..
       dockerfile: apps/api-core/Dockerfile.dev
     container_name: "vet-api"
     depends_on:
-      - reverse-proxy
+      - db
     develop:
       watch:
         - action: sync
@@ -30,7 +35,6 @@ services:
       dockerfile: apps/ui-desktop/Dockerfile.dev
     container_name: "vet-ui-desktop"
     depends_on:
-      - reverse-proxy
       - api
     develop:
         watch:
@@ -45,12 +49,12 @@ services:
           - action: rebuild
             path: ../../pnpm-lock.yaml
   ui-mobile:
+    # environment:
     build:
       context: ../..
       dockerfile: apps/ui-mobile/Dockerfile.dev
     container_name: "vet-ui-mobile"
     depends_on:
-      - reverse-proxy
       - api
     develop:
         watch:
@@ -64,3 +68,64 @@ services:
               - .nuxt
           - action: rebuild
             path: ../../pnpm-lock.yaml
+  db:
+    image: postgres:18.4-alpine
+    restart: always
+    container_name: "vet-db"
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASS}"
+      POSTGRES_DB: "${DB_NAME}"
+    ports:
+      - "${DB_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/18/docker
+  redis:
+    image: redis/redis-stack:7.4.0-v5
+    container_name: "vet-redis"
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      retries: 3
+      timeout: 5s
+  mailpit:
+    image: axllent/mailpit:v1.2.6
+    container_name: "vet-mailpit"
+    ports:
+      - "${MAILPIT_DASHBOARD_PORT}:8025"
+      - "${MAILPIT_PORT}:1025"
+  meilisearch:
+    image: "getmeili/meilisearch:nightly"
+    container_name: "vet-meilisearch"
+    ports:
+      - "${MEILISEARCH_PORT}:7700"
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilisearch-data:/meli_data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--spider",
+          "http://localhost:7700/health",
+        ]
+      retries: 3
+      timeout: 5s
+volumes:
+  pgdata:
+    driver: local
+  redis-data:
+    driver: local
+  meilisearch-data:
+    driver: local
