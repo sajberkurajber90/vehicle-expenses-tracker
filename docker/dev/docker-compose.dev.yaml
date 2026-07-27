@@ -14,7 +14,17 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./cert:/etc/nginx/ssl:ro
   api:
-    # environment:
+    environment:
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BASE_URL: ${PROXY_BASE_URL}
+      UI_MOBILE_PREFIX: ${UI_MOBILE_PREFIX}
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_PASS: "${DB_PASS}"
+      DB_USER: "${DB_USER}"
+      DB_NAME: "${DB_NAME}"
+      MAILPIT_HOST: "${MAILPIT_HOST}"
+      MAILPIT_PORT: "${MAILPIT_PORT}"
     build:
       context: ../..
       dockerfile: apps/api-core/Dockerfile.dev
@@ -29,7 +39,9 @@ services:
         - action: rebuild
           path: ../../pnpm-lock.yaml
   ui-desktop:
-#    environment:
+    environment:
+      BASE_URL: ${PROXY_BASE_URL}
+      API_PREFIX: ${API_PREFIX}
     build:
       context: ../..
       dockerfile: apps/ui-desktop/Dockerfile.dev

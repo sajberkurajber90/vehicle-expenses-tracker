@@ -1,11 +1,15 @@
-import { createServer } from 'node:http';
+import server from './app.ts';
+
 async function start() {
-  createServer(async (req, res) => {
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello, World!\n test 1233 \n');
-  }).listen(3000, '0.0.0.0', () => {
-    console.warn('server started yes');
-  });
+  try {
+    server.listen({ port: 3000, host: '0.0.0.0' }, function (err, address) {
+      if (err) {
+        console.warn(err);
+        process.exit(1);
+      }
+      console.info(`server listening on ${address}`);
+    });
+  } catch (err) {}
 }
 
 start().catch(() => {
