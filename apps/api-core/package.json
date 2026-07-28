@@ -2,11 +2,11 @@
   "name": "api-core",
   "description": "",
   "scripts": {
-    "start:dev": "npx nodemon",
-    "db:migrate": "docker-compose exec --user app --workdir /app api npx ts-node src/infrastructure/db/migrate.ts",
+    "start:dev": "pnpm exec nodemon",
+    "db:migrate": "docker-compose exec --user app --workdir /app api pnpm exec tsx src/infrastructure/db/migrate.ts",
     "db:create-migration": "docker-compose exec --user app --workdir /app api node src/scripts/migrate-template.js",
-    "db:up": "docker-compose exec --user app --workdir /app api npx ts-node src/infrastructure/db/up.ts",
-    "db:down": "docker-compose exec --user app --workdir /app api npx ts-node src/infrastructure/db/down.ts",
+    "db:up": "docker-compose exec --user app --workdir /app api pnpm exec tsx src/infrastructure/db/up.ts",
+    "db:down": "docker-compose exec --user app --workdir /app api pnpm exec tsx src/infrastructure/db/down.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,7 +17,7 @@
     "@types/node": "^25.9.1",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "8.20.0",
-    "ts-node": "^10.9.2",
+    "tsx": "^3.12.7",
     "nodemon": "^3.1.14",
     "typescript": "^6.0.3"
   },

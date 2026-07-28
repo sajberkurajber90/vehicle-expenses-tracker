@@ -19,7 +19,7 @@ function route(
     async handler(request, reply) {
       try {
         // Construct request URL
-        const url = new URL(request.url, `http://${request.headers.host}`);
+        const url = new URL(request.url, `https://${request.headers.host}`);
 
         // Convert Fastify headers to standard Headers object
         const headers = fromNodeHeaders(request.headers);
@@ -36,7 +36,6 @@ function route(
         response.headers.forEach((value, key) => reply.header(key, value));
         return reply.send(response.body ? await response.text() : null);
       } catch (error) {
-        instance.log.error('Authentication Error:', error);
         return reply.status(500).send({
           error: 'Internal authentication error',
           code: 'AUTH_FAILURE',

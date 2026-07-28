@@ -9,7 +9,7 @@ export const transporter = nodemailer.createTransport({
 export async function sendMail(to: string, subject: string, text: string) {
   try {
     await transporter.sendMail({
-      from: 'no-reply@kurajber.com',
+      from: `no-reply@${process.env.BASE_URL || 'example.com'}`,
       to,
       subject,
       text,

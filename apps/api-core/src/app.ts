@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 const server = fastify();
 
 // routes
+import authRoute from './modules/auth/route.ts';
 import dashboardRoute from './modules/dashboard/route.ts';
 
 server.register(cors, {
@@ -16,6 +17,7 @@ server.register(cors, {
   maxAge: 86400,
 });
 
+server.register(authRoute);
 server.register(dashboardRoute);
 
 export default server;

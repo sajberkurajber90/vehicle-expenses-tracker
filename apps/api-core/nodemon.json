@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ext": ".ts,.js",
   "ignore": [],
-  "exec": "npx ts-node src/server.ts"
+  "exec": "pnpm exec tsx src/server.ts"
 }
