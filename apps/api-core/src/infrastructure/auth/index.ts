@@ -4,10 +4,15 @@ import { betterAuth } from 'better-auth';
 
 process.env.BETTER_AUTH_SECRET || console.warn('BETTER_AUTH_SECRET is not set');
 
+console.log('origin', process.env.BASE_URL, process.env.UI_MOBILE_PREFIX);
+
 const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: `https://${process.env.BASE_URL}`,
+  baseURL: {
+    allowedHosts: [process.env.BASE_URL || '', `*.${process.env.BASE_URL}`],
+    protocol: 'https',
+  },
   trustedOrigins: [
     `https://${process.env.BASE_URL}`,
     `https://${process.env.UI_MOBILE_PREFIX}.${process.env.BASE_URL}`,

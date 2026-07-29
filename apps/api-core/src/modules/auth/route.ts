@@ -14,7 +14,7 @@ function route(
   done: HookHandlerDoneFunction,
 ) {
   instance.route({
-    method: ['GET', 'POST'],
+    method: ['GET', 'POST', 'OPTIONS'],
     url: '/api/auth/*',
     async handler(request, reply) {
       try {

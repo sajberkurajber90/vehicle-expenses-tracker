@@ -11,7 +11,7 @@ server.register(cors, {
     `https://${process.env.BASE_URL}`,
     `https://${process.env.UI_MOBILE_PREFIX}.${process.env.BASE_URL}`,
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
   maxAge: 86400,

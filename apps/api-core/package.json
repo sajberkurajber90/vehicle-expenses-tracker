@@ -3,10 +3,6 @@
   "description": "",
   "scripts": {
     "start:dev": "pnpm exec nodemon",
-    "db:migrate": "docker-compose exec --user app --workdir /app api pnpm exec tsx src/infrastructure/db/migrate.ts",
-    "db:create-migration": "docker-compose exec --user app --workdir /app api node src/scripts/migrate-template.js",
-    "db:up": "docker-compose exec --user app --workdir /app api pnpm exec tsx src/infrastructure/db/up.ts",
-    "db:down": "docker-compose exec --user app --workdir /app api pnpm exec tsx src/infrastructure/db/down.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
