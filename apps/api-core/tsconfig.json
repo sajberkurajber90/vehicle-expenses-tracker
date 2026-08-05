@@ -7,7 +7,7 @@
     "types": ["node"],
     "noEmit": true,
     "paths": {
-       "@infrastructure/*": ["./src/infrastructure/*"]
+       "@infrastructure/*": ["./src/infrastructure/*"],
      }
   }
 }

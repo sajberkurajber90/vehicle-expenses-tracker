@@ -14,7 +14,7 @@ function route(
   done: HookHandlerDoneFunction,
 ) {
   instance.route({
-    method: ['GET', 'POST', 'OPTIONS'],
+    method: ['GET', 'POST'],
     url: '/api/auth/*',
     async handler(request, reply) {
       try {
@@ -32,9 +32,11 @@ function route(
         // Process authentication request
         const response = await auth.handler(req);
         // Forward response to client
-        await reply.status(response.status);
+        reply.status(response.status);
         response.headers.forEach((value, key) => reply.header(key, value));
-        return reply.send(response.body ? await response.text() : null);
+        // return reply.send(response.body ? await response.text() : null);
+        const body = response.body ? await response.text() : null;
+        return reply.send(body);
       } catch (error) {
         return reply.status(500).send({
           error: 'Internal authentication error',

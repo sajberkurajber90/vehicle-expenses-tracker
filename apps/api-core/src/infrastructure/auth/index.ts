@@ -2,17 +2,15 @@ import { pool } from '@infrastructure/db/index.ts';
 import { sendMail } from '@infrastructure/mail/index.ts';
 import { betterAuth } from 'better-auth';
 
+import { canCreateSuperAdmin } from '../../modules/auth/services.ts';
+
 process.env.BETTER_AUTH_SECRET || console.warn('BETTER_AUTH_SECRET is not set');
 
-console.log('origin', process.env.BASE_URL, process.env.UI_MOBILE_PREFIX);
-
 const auth = betterAuth({
+  plugins: [canCreateSuperAdmin()],
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: {
-    allowedHosts: [process.env.BASE_URL || '', `*.${process.env.BASE_URL}`],
-    protocol: 'https',
-  },
+  baseURL: `https://api.${process.env.BASE_URL}`,
   trustedOrigins: [
     `https://${process.env.BASE_URL}`,
     `https://${process.env.UI_MOBILE_PREFIX}.${process.env.BASE_URL}`,
@@ -90,6 +88,7 @@ const auth = betterAuth({
     },
   },
   advanced: {
+    useSecureCookies: true,
     defaultCookieAttributes: {
       sameSite: 'none',
       secure: true,
