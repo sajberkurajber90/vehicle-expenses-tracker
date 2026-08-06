@@ -2,7 +2,7 @@ import { pool } from '@infrastructure/db/index.ts';
 import { sendMail } from '@infrastructure/mail/index.ts';
 import { betterAuth } from 'better-auth';
 
-import { canCreateSuperAdmin } from '../../modules/auth/services.ts';
+import { canCreateSuperAdmin } from './services.ts';
 
 process.env.BETTER_AUTH_SECRET || console.warn('BETTER_AUTH_SECRET is not set');
 
@@ -10,6 +10,7 @@ const auth = betterAuth({
   plugins: [canCreateSuperAdmin()],
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
+  basePath: '/auth',
   baseURL: `https://api.${process.env.BASE_URL}`,
   trustedOrigins: [
     `https://${process.env.BASE_URL}`,

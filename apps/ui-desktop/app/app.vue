@@ -5,7 +5,7 @@ onMounted(async () => {
   const config = useRuntimeConfig();
   try {
     const response = await fetch(
-      (config.public.apiBase as string) + '/api/auth/sign-up/email',
+      (config.public.apiBase as string) + '/auth/sign-up/email',
       {
         method: 'POST',
         credentials: 'include',
@@ -28,5 +28,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>Desktop</div>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>

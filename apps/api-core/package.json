@@ -13,20 +13,22 @@
     "@types/node": "^25.9.1",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "8.20.0",
-    "tsx": "^3.12.7",
+    "@types/ws": "^8.18.1",
     "nodemon": "^3.1.14",
+    "tsx": "^3.12.7",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "better-auth": "^1.6.23",
-    "zod": "^3.21.4",
-    "fastify": "^5.8.5",
     "@fastify/cors": "^11.2.0",
+    "better-auth": "^1.6.23",
     "dotenv": "^17.2.0",
-    "pg": "^8.22.0",
+    "fastify": "^5.8.5",
     "kysely": "^0.28.17",
-    "redis": "^5.8.2",
     "meilisearch": "^0.51.0",
-    "nodemailer": "^9.0.3"
+    "nodemailer": "^9.0.3",
+    "pg": "^8.22.0",
+    "redis": "^5.8.2",
+    "ws": "^8.21.2",
+    "zod": "^3.21.4"
   }
 }

@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -9,8 +10,9 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    plugins: [tailwindcss() as any],
     server: {
-      allowedHosts: ['vehicle-expenses-tracker.local'],
+      allowedHosts: [process.env.BASE_URL || 'vehicle-expenses-tracker.local'],
       hmr: {
         protocol: 'wss',
         host: process.env.BASE_URL || 'vehicle-expenses-tracker.local',
@@ -19,4 +21,5 @@ export default defineNuxtConfig({
       },
     },
   },
+  css: ['~/assets/css/index.css'],
 });

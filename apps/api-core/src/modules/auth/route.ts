@@ -4,7 +4,7 @@ import type {
   HookHandlerDoneFunction,
 } from 'fastify';
 
-import auth from '@infrastructure/auth/index.ts';
+import auth from './config.ts';
 
 import { fromNodeHeaders } from 'better-auth/node';
 
@@ -15,7 +15,7 @@ function route(
 ) {
   instance.route({
     method: ['GET', 'POST'],
-    url: '/api/auth/*',
+    url: '/auth/*',
     async handler(request, reply) {
       try {
         // Construct request URL
