@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   runtimeConfig: {
+    apiInternalBase: 'http://api:3000',
     public: {
       apiBase: `https://${process.env.API_PREFIX || 'api'}.${process.env.BASE_URL || 'vehicle-expenses-tracker.local'}`,
     },

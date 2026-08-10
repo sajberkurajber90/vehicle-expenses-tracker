@@ -70,7 +70,7 @@ if [ ! -d "$NODE_MODULES_DIR" ]; then
   pnpm install
 fi
 
-# TODO: generate nginx.conf file for reverse proxy
+# TODO: generate nginx.conf file for reverse proxy - use fastify reverse proxy config as template
 
 # run docker compose
 #docker compose -f docker/dev/docker-compose.dev.yaml --env-file .env watch

@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 onMounted(async () => {
   const config = useRuntimeConfig();
   try {
     const response = await fetch(
-      (config.public.apiBase as string) + '/auth/sign-up/email',
+      (config.public.apiBase as string) + '/auth/register-complete',
       {
-        method: 'POST',
+        method: 'GET',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 't@b.com',
-          password: 'password',
-        }),
       },
     );
     const data = await response.text();
