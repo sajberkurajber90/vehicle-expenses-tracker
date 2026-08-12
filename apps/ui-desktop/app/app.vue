@@ -6,7 +6,7 @@ onMounted(async () => {
   const config = useRuntimeConfig();
   try {
     const response = await fetch(
-      (config.public.apiBase as string) + '/auth/register-complete',
+      (config.public.apiBase as string) + '/auth/app-register-complete',
       {
         method: 'GET',
         credentials: 'include',

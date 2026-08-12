@@ -15,7 +15,8 @@
     "vue-router": "^5.0.7",
      "tailwindcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
-    "daisyui": "^5.7.0"
+    "daisyui": "^5.7.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^1.15.2"

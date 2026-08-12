@@ -2,9 +2,9 @@ import { BetterAuthPlugin } from 'better-auth';
 import { createAuthEndpoint } from 'better-auth/api';
 
 // app registration - first user registration (guards sign-up route)
-export const canCreateSuperAdmin = () => {
+export const canSignUp = () => {
   return {
-    id: 'can-create-super-admin',
+    id: 'can-sign-up',
     hooks: {
       before: [
         {
@@ -27,19 +27,25 @@ export const canActivateUser = () => {
   } satisfies BetterAuthPlugin;
 };
 
-export const registerComplete = () => {
+export const appRegisterComplete = () => {
   return {
-    id: 'register-complete',
+    id: 'app-register-complete',
     endpoints: {
       getIsRegisterComplete: createAuthEndpoint(
-        '/register-complete',
+        '/app-register-complete',
         {
           method: 'GET',
         },
-        async (ctx) => {
-          return ctx.json({ isRegisterComplete: true });
+        async (endpoint) => {
+          const usersCount = await endpoint.context.adapter.count({
+            model: 'users',
+          });
+
+          return endpoint.json({
+            isRegisterComplete: usersCount > 0,
+          });
         },
       ),
     },
-  };
+  } satisfies BetterAuthPlugin;
 };
