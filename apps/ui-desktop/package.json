@@ -16,7 +16,9 @@
      "tailwindcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
     "daisyui": "^5.7.0",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "pinia": "^4.0.3",
+    "@pinia/nuxt": "^1.0.2"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^1.15.2"

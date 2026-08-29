@@ -1,18 +1,24 @@
+import { useAPI } from '~/composables/useAPI';
+
 interface AppRegisterCompleteResponse {
   isRegisterComplete: boolean;
 }
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const config = useRuntimeConfig();
+  const fetch = useAPI();
   // TODO: add error handling for fetch requests
   // only on server - for redirect purposes
   if (import.meta.server) {
-    const url = config.apiInternalBase as string;
-    const { data: session } = await useFetch(`${url}/auth/get-session`);
+    const { data: session } = await useFetch(`/auth/get-session`, {
+      $fetch: fetch,
+    });
 
     if (session.value === null) {
       const { data: response } = await useFetch<AppRegisterCompleteResponse>(
-        `${url}/auth/app-register-complete`,
+        `/auth/app-register-complete`,
+        {
+          $fetch: fetch,
+        },
       );
 
       if (

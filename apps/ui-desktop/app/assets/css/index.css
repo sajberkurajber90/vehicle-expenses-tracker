@@ -3,3 +3,10 @@
     themes: light --default, dark --prefersdark;
 }
 
+@utility btn {
+  @apply shadow-none;
+}
+
+@utility input {
+    @apply  focus:outline-none focus:shadow-none;
+}
