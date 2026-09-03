@@ -28,8 +28,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         return navigateTo('/register-app');
       }
 
-      if (to.path === '/register-app') {
-        return;
+      if (
+        to.path === '/register-app' &&
+        response.value?.isRegisterComplete === true
+      ) {
+        return navigateTo('/login');
       }
 
       if (to.path !== '/login' && response.value?.isRegisterComplete === true) {

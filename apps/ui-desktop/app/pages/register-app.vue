@@ -1,17 +1,22 @@
 <script setup lang="ts">
+type Field =
+  'email' | 'password' | 'confirmPassword' | 'firstName' | 'lastName';
+
 definePageMeta({
   layout: 'auth',
 });
 
 import { registerAppSchema } from '~/features/auth';
+import { useAuthStore } from '~/features/auth';
 
-type Field =
-  'email' | 'password' | 'confirmPassword' | 'firstName' | 'lastName';
+const authStore = useAuthStore();
+const submitState = ref<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
 const inputForm = reactive({
   email: '',
   password: '',
   confirmPassword: '',
+  name: '',
   firstName: '',
   lastName: '',
 });
@@ -39,6 +44,13 @@ const focusedFields = reactive({
   firstName: false,
   lastName: false,
 });
+
+watch(
+  () => [inputForm.firstName, inputForm.lastName],
+  (newValues) => {
+    inputForm.name = `${newValues[0]} ${newValues[1]}`.trim();
+  },
+);
 
 function validate(field: Field) {
   switch (field) {
@@ -170,7 +182,9 @@ function onFocus(field: Field) {
 }
 
 async function onSubmit() {
-  console.log('submit', registerAppSchema.safeParse(inputForm));
+  submitState.value = 'submitting';
+  await authStore.registerApp(inputForm);
+  submitState.value = 'idle';
 }
 </script>
 
@@ -330,7 +344,12 @@ async function onSubmit() {
           </p>
         </div>
       </div>
-      <div class="col-span-3 justify-self-end">
+      <div class="col-span-3 flex justify-between items-center">
+        <div v-show="submitState === 'idle'"></div>
+        <div
+          v-show="submitState === 'submitting'"
+          class="loading loading-spinner text-success"
+        ></div>
         <button @click="onSubmit" class="btn btn-primary">Register</button>
       </div>
     </form>

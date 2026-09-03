@@ -1,15 +1,25 @@
-import type { $Fetch } from 'ofetch';
-import type { RegisterAppInput } from '~/features/auth/auth.schema';
-import { $fetch } from 'ofetch';
+import type {
+  RegisterAppRequest,
+  RegisterAppResponse,
+} from '~/features/auth/auth.schema';
+import { FetchError } from 'ofetch';
+type APIFetch = typeof $fetch;
 
-class AuthRepository {
-  constructor(private readonly f: $Fetch) {}
+export class AuthRepository {
+  constructor(private readonly f: APIFetch) {}
 
-  async registerApp(payload: RegisterAppInput) {
-    return await this.f('/auth/sign-up', {
-      method: 'POST',
-      body: payload,
-    });
+  async registerApp(payload: RegisterAppRequest) {
+    try {
+      return this.f<RegisterAppResponse>('/auth/sign-up/email', {
+        method: 'POST',
+        body: payload,
+      });
+    } catch (err: unknown) {
+      if (err instanceof FetchError) {
+        console.log('fetch error', err.response, err.cause, err.data);
+      }
+      console.log('other err', err);
+    }
   }
 
   async getUserSession() {
@@ -21,6 +31,3 @@ class AuthRepository {
 }
 
 export type IAuthRepository = AuthRepository;
-const authRepository = new AuthRepository($fetch);
-
-export default authRepository;
