@@ -15,6 +15,12 @@ server.register(cors, {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
   maxAge: 86400,
+}).setErrorHandler((error, request, reply) => {
+  if(error instanceof Error) {
+    return reply.status(400).send({ error: error.message });
+  }
+
+  reply.status(500).send({ error: 'Internal Server Error' });
 });
 
 server.register(authRoute);

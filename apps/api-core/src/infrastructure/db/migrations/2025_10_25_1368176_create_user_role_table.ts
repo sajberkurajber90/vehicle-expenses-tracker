@@ -7,7 +7,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.references('users.id').notNull(),
     )
     .addColumn('role_id', 'integer', (col) =>
-      col.references('roles.id').notNull(),
+      col.references('authorization.id').notNull(),
     )
     .addColumn('created_at', 'timestamptz', (col) =>
       col.notNull().defaultTo(sql`now()`),

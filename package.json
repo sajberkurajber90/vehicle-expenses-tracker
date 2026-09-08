@@ -11,6 +11,7 @@
     "api:db:create-migration": "docker compose -f ./docker/dev/docker-compose.dev.yaml --env-file .env exec --user app --workdir /app/apps/api-core api node src/scripts/migrate-template.js",
     "api:db:up": "docker compose -f ./docker/dev/docker-compose.dev.yaml --env-file .env exec --user app --workdir /app/apps/api-core api pnpm exec tsx src/infrastructure/db/up.ts",
     "api:db:down": "docker compose -f ./docker/dev/docker-compose.dev.yaml --env-file .env exec --user app --workdir /app/apps/api-core api pnpm exec tsx src/infrastructure/db/down.ts",
+    "api:permissions:seed": "docker compose -f ./docker/dev/docker-compose.dev.yaml --env-file .env exec --user app --workdir /app/apps/api-core api pnpm exec tsx src/infrastructure/permissions/sync.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

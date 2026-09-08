@@ -5,9 +5,7 @@ import type {
   Selectable,
   Updateable,
 } from 'kysely';
-// import roles from "../../permissions/config/roles.json"  with { type: 'json' };
-
-type RoleName = 'super-admin' | 'admin' | 'user' | 'guest';
+import type { RoleName } from '@infrastructure/permissions/config/roles.ts';
 
 export interface RoleTable {
   id: Generated<number>;
