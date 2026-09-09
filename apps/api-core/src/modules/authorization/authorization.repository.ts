@@ -6,8 +6,9 @@ import type { Role } from '@infrastructure/db/types/roles.ts';
 import { NotFoundError } from '@modules/shared/errors.ts';
 import { Result } from '@modules/shared/result.ts';
 
-export class RolesRepository {
+export class AuthorizationRepository {
   constructor(private readonly db: Kysely<Database>) {}
+
   async getAllRoles(): Promise<Role[]> {
     return this.db.selectFrom('roles').selectAll().execute();
   }
@@ -29,8 +30,18 @@ export class RolesRepository {
 
     return { ok: true, value: response };
   }
+
+  async allocateRoleToUser(userId: number, roleId: number): Promise<void> {
+    await this.db
+      .insertInto('user_role')
+      .values({
+        userId: userId,
+        roleId: roleId,
+      })
+      .executeTakeFirst();
+  }
 }
 
-export type IRolesRepository = RolesRepository;
+export type IAuthorizationRepository = AuthorizationRepository;
 
-export const rolesRepository = new RolesRepository(db);
+export const rolesRepository = new AuthorizationRepository(db);

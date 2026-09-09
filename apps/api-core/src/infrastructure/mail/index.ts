@@ -6,15 +6,11 @@ export const transporter = nodemailer.createTransport({
   secure: false,
 });
 
-export async function sendMail(to: string, subject: string, text: string) {
-  try {
-    await transporter.sendMail({
-      from: `no-reply@${process.env.BASE_URL || 'example.com'}`,
-      to,
-      subject,
-      text,
-    });
-  } catch (e) {
-    throw new Error('Failed to send email');
-  }
+export async function sendMail(to: string, subject: string, html: string) {
+  await transporter.sendMail({
+    from: `no-reply@${process.env.BASE_URL || 'example.com'}`,
+    to,
+    subject,
+    html,
+  });
 }

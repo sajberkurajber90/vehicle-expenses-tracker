@@ -1,6 +1,6 @@
 import { Kysely, sql } from 'kysely';
 
-export async function up(db: Kysely<any>): Promise<void> {
+export async function up(db: Kysely<never>): Promise<void> {
   await db.schema
     .createTable('user_permission')
     .addColumn('user_id', 'integer', (col) =>
@@ -22,6 +22,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 }
 
-export async function down(db: Kysely<any>): Promise<void> {
+export async function down(db: Kysely<never>): Promise<void> {
   await db.schema.dropTable('user_permission').execute();
 }

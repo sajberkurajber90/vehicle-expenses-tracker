@@ -36,6 +36,12 @@ const auth = betterAuth({
         maxLength: 50,
         fieldName: 'lastname',
       },
+      deletedAt: {
+        type: 'date',
+        required: false,
+        input: false,
+        fieldName: 'deleted_at',
+      },
     },
   },
   session: {
@@ -78,11 +84,13 @@ const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignIn: true,
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, token }, request) => {
+      const url = `https://${process.env.BASE_URL}/verify-email?token=${token}`;
       await sendMail(
         user.email,
-        'Verify your email',
-        `Click the link to verify your email: ${url}`,
+        'Email Verification',
+        `<h2>Dear ${user.name}</h2>
+              <p>Please verify your email by clicking the following link: <a href="${url}">Verify</a></p>`,
       );
     },
   },
