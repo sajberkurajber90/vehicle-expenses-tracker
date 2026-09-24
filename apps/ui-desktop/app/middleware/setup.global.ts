@@ -1,52 +1,42 @@
 import { useAPI } from '~/composables/useAPI';
-
-interface AppRegisterCompleteResponse {
-  isRegisterComplete: boolean;
-}
+import resolveAppState, { policies } from '~/utils/resolve.app.state';
+import { registerAppSchemaCompleted } from '~/features/auth';
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const fetch = useAPI();
-  // TODO: add error handling for fetch requests
-  // TODO: refactor this middleware to be more efficient - to avoid inf loops
-  // only on server - for redirect purposes
   if (import.meta.server) {
     const { data: session } = await useFetch(`/auth/get-session`, {
       $fetch: fetch,
     });
 
     if (session.value === null) {
-      const { data: response } = await useFetch<AppRegisterCompleteResponse>(
+      const { data: response } = await useFetch<unknown>(
         `/auth/app-register-complete`,
         {
           $fetch: fetch,
         },
       );
 
-      if (
-        to.path !== '/register-app' &&
-        response.value?.isRegisterComplete === false
-      ) {
-        return navigateTo('/register-app');
+      const parsed = registerAppSchemaCompleted.safeParse(response.value);
+
+      if (!parsed.success) {
+        navigateTo('/login');
       }
 
-      if (
-        to.path === '/register-app' &&
-        response.value?.isRegisterComplete === true
-      ) {
-        return navigateTo('/login');
-      }
+      const appState = resolveAppState(
+        session.value,
+        parsed.success ? parsed.data.isRegisterComplete : false,
+      );
 
-      if (to.path === '/login') {
-        return;
+      if (!policies[appState].allow(to.path)) {
+        return navigateTo(policies[appState].redirectTo);
       }
+    }
 
-      if (to.path !== '/login' && response.value?.isRegisterComplete === true) {
-        if (to.path === '/verify-email') {
-          return;
-        }
+    const appState = resolveAppState(session.value, true);
 
-        return navigateTo('/login');
-      }
+    if (!policies[appState].allow(to.path)) {
+      return navigateTo(policies[appState].redirectTo);
     }
   }
 });

@@ -38,10 +38,13 @@ export const registerAppSchemaRefined = registerAppSchema.refine(
   },
 );
 
+export const registerAppSchemaCompleted = z.object({
+  isRegisterComplete: z.boolean(),
+});
 export type RegisterAppFormInput = z.infer<typeof registerAppSchema>;
 export type RegisterAppRequest = Omit<RegisterAppFormInput, 'confirmPassword'>;
 
-export const RegisterAppResponseSchema = z.object({
+export const registerAppResponseSchema = z.object({
   token: z.string().nullable(),
   user: z.object({
     id: z.coerce.number(),
@@ -54,7 +57,7 @@ export const RegisterAppResponseSchema = z.object({
   }),
 });
 
-export type RegisterAppResponse = z.infer<typeof RegisterAppResponseSchema>;
+export type RegisterAppResponse = z.infer<typeof registerAppResponseSchema>;
 
 // user session
 export const userSessionSchema = z.object({
