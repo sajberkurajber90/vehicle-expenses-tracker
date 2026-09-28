@@ -36,8 +36,16 @@ export class AuthService {
     if (!validation.success) {
       console.log(validation.error?.errors);
     }
+
+    try {
+      console.log(await this.repo.login(payload));
+    } catch (e) {
+      console.log(e);
+    }
   }
-  async logout() {}
+  async logout() {
+    console.log(await this.repo.logout(), 'logout');
+  }
 }
 
 export type IAuthService = AuthService;

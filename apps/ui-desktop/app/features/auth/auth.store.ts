@@ -13,6 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
   const repository = new AuthRepository(
     $fetch.create({
       baseURL: config.public.apiBase,
+      credentials: 'include',
     }),
   );
 
@@ -27,10 +28,18 @@ export const useAuthStore = defineStore('auth', () => {
     await service.registerApp(payload);
   }
 
-  async function login(payload: LoginInput) {}
+  async function login(payload: LoginInput) {
+    await service.login(payload);
+  }
+
+  async function logout() {
+    await service.logout();
+  }
 
   return {
     session,
     registerApp,
+    login,
+    logout,
   };
 });

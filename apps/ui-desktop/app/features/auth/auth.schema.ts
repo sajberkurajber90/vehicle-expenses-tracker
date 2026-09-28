@@ -7,6 +7,11 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
+// logout
+export const logoutSchema = z.object({
+  success: z.boolean(),
+});
+
 // register app
 export const registerAppSchema = z.object({
   email: z.string().email(),
@@ -61,8 +66,7 @@ export type RegisterAppResponse = z.infer<typeof registerAppResponseSchema>;
 
 // user session
 export const userSessionSchema = z.object({
-  id: z.number(),
-  email: z.string().email(),
+  token: z.string(),
 });
 
 export type IUserSession = z.infer<typeof userSessionSchema>;

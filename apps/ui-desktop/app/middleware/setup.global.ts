@@ -5,22 +5,26 @@ import { registerAppSchemaCompleted } from '~/features/auth';
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const fetch = useAPI();
   if (import.meta.server) {
-    const { data: session } = await useFetch(`/auth/get-session`, {
-      $fetch: fetch,
-    });
+    // TODO: add session parse logic here
+    const { data: session, error: sessionError } = await useFetch(
+      `/auth/get-session`,
+      {
+        $fetch: fetch,
+        credentials: 'include',
+      },
+    );
+
+    console.log(session.value, 'session value');
 
     if (session.value === null) {
-      const { data: response } = await useFetch<unknown>(
-        `/auth/app-register-complete`,
-        {
+      const { data: response, error: appRegisterError } =
+        await useFetch<unknown>(`/auth/app-register-complete`, {
           $fetch: fetch,
-        },
-      );
+        });
 
       const parsed = registerAppSchemaCompleted.safeParse(response.value);
-
       if (!parsed.success) {
-        navigateTo('/login');
+        return navigateTo('/login');
       }
 
       const appState = resolveAppState(
@@ -31,6 +35,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       if (!policies[appState].allow(to.path)) {
         return navigateTo(policies[appState].redirectTo);
       }
+
+      return;
     }
 
     const appState = resolveAppState(session.value, true);

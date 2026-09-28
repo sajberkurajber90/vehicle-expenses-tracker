@@ -95,6 +95,10 @@ const auth = betterAuth({
     },
   },
   advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: `${process.env.BASE_URL}`,
+    },
     useSecureCookies: true,
     defaultCookieAttributes: {
       sameSite: 'none',
