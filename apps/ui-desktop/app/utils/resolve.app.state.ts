@@ -1,3 +1,5 @@
+import type { AuthUserResponse } from '~/features/auth';
+
 type AppState = 'unregistered' | 'needs-login' | 'authenticated';
 
 type RoutePolicy = {
@@ -6,7 +8,7 @@ type RoutePolicy = {
 };
 
 export default function resolveAppState(
-  session: unknown,
+  session: AuthUserResponse | null, // TODO: Replace with IUserSession | null when the session is typed
   isRegisterComplete: boolean,
 ): AppState {
   if (!isRegisterComplete) {

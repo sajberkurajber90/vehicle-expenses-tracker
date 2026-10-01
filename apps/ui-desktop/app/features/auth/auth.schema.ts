@@ -1,19 +1,63 @@
 import { z } from 'zod';
 
-// login
-export const loginSchema = z.object({
+// user session
+export const authUserResponseSchema = z.object({
+  id: z.coerce.number(),
   email: z.string().email(),
-  password: z.string().min(8),
+  emailVerified: z.boolean(),
+  firstName: z.string(),
+  lastName: z.string(),
+  name: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  deletedAt: z.coerce.date().nullable(),
 });
-export type LoginInput = z.infer<typeof loginSchema>;
+
+export const authSessionResponseSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.coerce.number(),
+  token: z.string(),
+  expiresAt: z.coerce.date(),
+  ipAddress: z.string(),
+  userAgent: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export const authUserSessionResponseSchema = z.object({
+  user: authUserResponseSchema,
+  session: authSessionResponseSchema,
+});
+
+export type AuthUserResponse = z.infer<typeof authUserResponseSchema>;
+export type AuthSessionResponse = z.infer<typeof authSessionResponseSchema>;
+export type AuthUserSessionResponse = z.infer<
+  typeof authUserSessionResponseSchema
+>;
+
+// login
+export const loginInputSchema = z.object({
+  email: z.string().nonempty({ message: 'Email is required' }).email(),
+  password: z.string().nonempty({ message: 'Password is required' }),
+});
+
+export const loginResponseSchema = z.object({
+  token: z.string(),
+  user: authUserResponseSchema,
+});
+
+export type LoginInput = z.infer<typeof loginInputSchema>;
+export type LoginResponse = z.infer<typeof loginResponseSchema>;
 
 // logout
-export const logoutSchema = z.object({
+export const logoutResponseSchema = z.object({
   success: z.boolean(),
 });
 
+export type LogoutResponse = z.infer<typeof logoutResponseSchema>;
+
 // register app
-export const registerAppSchema = z.object({
+export const registerAppInputSchema = z.object({
   email: z.string().email(),
   password: z
     .string()
@@ -35,7 +79,7 @@ export const registerAppSchema = z.object({
     }),
 });
 
-export const registerAppSchemaRefined = registerAppSchema.refine(
+export const registerAppInputRefineSchema = registerAppInputSchema.refine(
   (data) => data.password === data.confirmPassword,
   {
     message: "Passwords don't match",
@@ -43,30 +87,18 @@ export const registerAppSchemaRefined = registerAppSchema.refine(
   },
 );
 
-export const registerAppSchemaCompleted = z.object({
+export const registerAppRequestSchema = registerAppInputSchema.omit({
+  confirmPassword: true,
+});
+
+export const registerAppCompleteResponseSchema = z.object({
   isRegisterComplete: z.boolean(),
 });
-export type RegisterAppFormInput = z.infer<typeof registerAppSchema>;
-export type RegisterAppRequest = Omit<RegisterAppFormInput, 'confirmPassword'>;
+
+export type RegisterAppInput = z.infer<typeof registerAppInputSchema>;
+export type RegisterAppRequest = z.infer<typeof registerAppRequestSchema>;
 
 export const registerAppResponseSchema = z.object({
   token: z.string().nullable(),
-  user: z.object({
-    id: z.coerce.number(),
-    email: z.string().email(),
-    firstName: z.string(),
-    lastName: z.string(),
-    name: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-  }),
+  user: authUserResponseSchema,
 });
-
-export type RegisterAppResponse = z.infer<typeof registerAppResponseSchema>;
-
-// user session
-export const userSessionSchema = z.object({
-  token: z.string(),
-});
-
-export type IUserSession = z.infer<typeof userSessionSchema>;

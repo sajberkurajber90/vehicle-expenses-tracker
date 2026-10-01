@@ -1,12 +1,16 @@
 import { useAPI } from '~/composables/useAPI';
 import resolveAppState, { policies } from '~/utils/resolve.app.state';
-import { registerAppSchemaCompleted } from '~/features/auth';
+import {
+  registerAppCompleteResponseSchema,
+  authUserSessionResponseSchema,
+  useAuthStore,
+} from '~/features/auth';
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const fetch = useAPI();
   if (import.meta.server) {
-    // TODO: add session parse logic here
-    const { data: session, error: sessionError } = await useFetch(
+    const authStore = useAuthStore();
+    const { data: session, error: sessionError } = await useFetch<unknown>(
       `/auth/get-session`,
       {
         $fetch: fetch,
@@ -14,15 +18,15 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       },
     );
 
-    console.log(session.value, 'session value');
-
     if (session.value === null) {
       const { data: response, error: appRegisterError } =
         await useFetch<unknown>(`/auth/app-register-complete`, {
           $fetch: fetch,
         });
 
-      const parsed = registerAppSchemaCompleted.safeParse(response.value);
+      const parsed = registerAppCompleteResponseSchema.safeParse(
+        response.value,
+      );
       if (!parsed.success) {
         return navigateTo('/login');
       }
@@ -39,7 +43,18 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       return;
     }
 
-    const appState = resolveAppState(session.value, true);
+    const parsedSession = authUserSessionResponseSchema.safeParse(
+      session.value,
+    );
+
+    authStore.setSession(
+      parsedSession.success ? parsedSession.data.user : null,
+    );
+
+    const appState = resolveAppState(
+      parsedSession.success ? parsedSession.data.user : null,
+      true,
+    );
 
     if (!policies[appState].allow(to.path)) {
       return navigateTo(policies[appState].redirectTo);

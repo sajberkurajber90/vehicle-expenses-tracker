@@ -1,59 +1,93 @@
-import type {
-  LoginInput,
-  RegisterAppRequest,
-  RegisterAppResponse,
+import {
+  type LoginInput,
+  type LoginResponse,
+  type LogoutResponse,
+  type RegisterAppRequest,
 } from '~/features/auth/auth.schema';
-import { FetchError } from 'ofetch';
+
+import type { z } from 'zod';
+import { type ApiError } from '~/utils/error';
+import type { Result } from '~/utils/result';
 type APIFetch = typeof $fetch;
 
 export class AuthRepository {
-  constructor(private readonly f: APIFetch) {}
+  constructor(
+    private readonly f: APIFetch,
+    private readonly toApiError: (err: unknown) => ApiError,
+    private readonly responseValidator: {
+      logoutResponseSchema: z.ZodType<LogoutResponse>;
+      loginResponseSchema: z.ZodType<LoginResponse>;
+    },
+  ) {}
 
-  async registerApp(payload: RegisterAppRequest) {
+  async registerApp(payload: RegisterAppRequest): Promise<unknown | ApiError> {
     try {
-      return await this.f<RegisterAppResponse>('/auth/sign-up/email', {
+      return await this.f<unknown>('/auth/sign-up/email', {
         method: 'POST',
         body: payload,
       });
     } catch (err: unknown) {
-      if (err instanceof FetchError) {
-        console.log('fetch error', err.response, err.cause, err.data);
-      }
-      console.log('other err', err);
+      return this.toApiError(err);
     }
   }
 
-  async login(payload: LoginInput): Promise<unknown> {
+  async login(payload: LoginInput): Promise<Result<LoginResponse> | ApiError> {
     try {
-      return await this.f<unknown>('/auth/sign-in/email', {
+      const response = await this.f<unknown>('/auth/sign-in/email', {
         method: 'POST',
         body: payload,
       });
-    } catch (err: unknown) {
-      if (err instanceof FetchError) {
-        console.log('fetch error', err.response, err.cause, err.data);
+
+      const validation =
+        this.responseValidator.loginResponseSchema.safeParse(response);
+
+      if (!validation.success) {
+        return {
+          kind: 'response-parse',
+          message: 'Failed to parse login response',
+          issues: validation.error.flatten().fieldErrors,
+        };
       }
-      console.log('other err', err);
+
+      return {
+        data: validation.data,
+      };
+    } catch (err: unknown) {
+      return this.toApiError(err);
     }
   }
 
-  async logout() {
+  async logout(): Promise<LogoutResponse | ApiError> {
     try {
-      return await this.f<void>('/auth/sign-out', {
+      const response = await this.f<unknown>('/auth/sign-out', {
         method: 'POST',
       });
-    } catch (err: unknown) {
-      if (err instanceof FetchError) {
-        console.log('fetch error', err.response, err.cause, err.data);
+
+      const validation =
+        this.responseValidator.logoutResponseSchema.safeParse(response);
+
+      if (!validation.success) {
+        return {
+          kind: 'response-parse',
+          message: 'Failed to parse logout response',
+          issues: validation.error.flatten().fieldErrors,
+        };
       }
-      console.log('other err', err);
+
+      return validation.data;
+    } catch (err: unknown) {
+      return this.toApiError(err);
     }
   }
 
-  async getUserSession() {
-    return await this.f('/auth/get-session', {
-      method: 'GET',
-    });
+  async getUserSession(): Promise<unknown | ApiError> {
+    try {
+      return await this.f<unknown>('/auth/get-session', {
+        method: 'GET',
+      });
+    } catch (err: unknown) {
+      return this.toApiError(err);
+    }
   }
 }
 

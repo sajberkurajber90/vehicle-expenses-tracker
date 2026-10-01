@@ -34,6 +34,7 @@ function onLeave() {
           <button v-if="expand" class="btn btn-primary" @click="logout">
             Logout
           </button>
+          <div v-if="expand">Welcome: {{ authStore.sessionUser?.name }}</div>
         </div>
         <div class="avatar avatar-placeholder">
           <div class="bg-neutral w-12 rounded-full">

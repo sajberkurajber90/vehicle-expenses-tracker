@@ -1,12 +1,5 @@
 function sessionFactory() {
-  return async () => {
-
-  };
+  return async () => {};
 }
-
-
-
-
-
 
 export default sessionFactory();
