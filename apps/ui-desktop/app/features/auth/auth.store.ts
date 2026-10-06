@@ -10,6 +10,7 @@ import {
   type RegisterAppInput,
   registerAppInputRefineSchema,
   registerAppRequestSchema,
+  registerAppResponseSchema,
 } from '~/features/auth/auth.schema';
 import { toApiError } from '~/utils/error';
 
@@ -22,8 +23,9 @@ export const useAuthStore = defineStore('auth', () => {
     }),
     toApiError,
     {
-      logoutResponseSchema, // Assuming you have a logout schema defined
+      logoutResponseSchema,
       loginResponseSchema,
+      registerAppResponseSchema,
     },
   );
 
@@ -40,7 +42,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function registerApp(payload: RegisterAppInput) {
-    await service.registerApp(payload);
+    const result = await service.registerApp(payload);
+
+    return 'data' in result ? null : result;
   }
 
   async function login(payload: LoginInput) {
@@ -56,7 +60,17 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    await service.logout();
+    const result = await service.logout();
+    if ('data' in result) {
+      sessionUser.value = null;
+      return null;
+    }
+    return result;
+  }
+
+  async function cleanUpOnLogout() {
+    // perform any necessary cleanup actions on logout
+    sessionUser.value = null;
   }
 
   return {
@@ -65,5 +79,6 @@ export const useAuthStore = defineStore('auth', () => {
     registerApp,
     login,
     logout,
+    cleanUpOnLogout,
   };
 });

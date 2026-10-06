@@ -15,7 +15,7 @@ class AuthorizationService {
       return user;
     }
 
-    const role = await this.repository.getRoleByName('super-admin');
+    const role = await this.repository.getRoleByName('admin');
     if (!role.ok) {
       return role;
     }

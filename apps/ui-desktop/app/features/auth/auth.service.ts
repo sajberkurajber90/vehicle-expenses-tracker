@@ -16,20 +16,19 @@ export class AuthService {
     },
   ) {}
 
-  // TODO: in doing
   async registerApp(payload: RegisterAppInput) {
     const validation = this.validator.registerPayload.safeParse(payload);
     if (!validation.success) {
-      console.log(validation.error?.errors);
+      return validation.error;
     }
 
     // omit confirmPassword from payload to create a request DTO
     const dto = this.validator.registerAppRequest.safeParse(validation.data);
 
     if (dto.success) {
-      await this.repo.registerApp(dto.data);
+      return await this.repo.registerApp(dto.data);
     } else {
-      console.log(dto.error?.errors);
+      return dto.error;
     }
   }
 
@@ -42,12 +41,11 @@ export class AuthService {
     return await this.repo.login(payload);
   }
   async logout() {
-    console.log(await this.repo.logout(), 'logout');
+    return await this.repo.logout();
   }
 
   async signUpUser() {}
   async resetPassword(email: string) {}
-  async verifyEmail(token: string) {}
 }
 
 export type IAuthService = AuthService;

@@ -95,10 +95,11 @@ export const registerAppCompleteResponseSchema = z.object({
   isRegisterComplete: z.boolean(),
 });
 
-export type RegisterAppInput = z.infer<typeof registerAppInputSchema>;
-export type RegisterAppRequest = z.infer<typeof registerAppRequestSchema>;
-
 export const registerAppResponseSchema = z.object({
   token: z.string().nullable(),
   user: authUserResponseSchema,
 });
+
+export type RegisterAppInput = z.infer<typeof registerAppInputSchema>;
+export type RegisterAppRequest = z.infer<typeof registerAppRequestSchema>;
+export type RegisterAppResponse = z.infer<typeof registerAppResponseSchema>;

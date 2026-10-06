@@ -1,5 +1,8 @@
+import { useAuthStore } from '~/features/auth';
+
 export function useAPI() {
   const config = useRuntimeConfig();
+  const { cleanUpOnLogout } = useAuthStore();
 
   return $fetch.create({
     baseURL: import.meta.server
@@ -18,6 +21,7 @@ export function useAPI() {
       // only on client side - for redirect purposes
       if (import.meta.client && response.status === 401) {
         await navigateTo('/login');
+        await cleanUpOnLogout();
       }
     },
   });

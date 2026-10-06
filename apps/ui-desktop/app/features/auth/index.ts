@@ -1,5 +1,6 @@
 export {
   loginInputSchema,
+  registerAppInputSchema,
   registerAppResponseSchema,
   registerAppCompleteResponseSchema,
   authUserSessionResponseSchema,

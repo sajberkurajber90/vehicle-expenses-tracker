@@ -3,6 +3,7 @@ import {
   type LoginResponse,
   type LogoutResponse,
   type RegisterAppRequest,
+  type RegisterAppResponse,
 } from '~/features/auth/auth.schema';
 
 import type { z } from 'zod';
@@ -17,15 +18,31 @@ export class AuthRepository {
     private readonly responseValidator: {
       logoutResponseSchema: z.ZodType<LogoutResponse>;
       loginResponseSchema: z.ZodType<LoginResponse>;
+      registerAppResponseSchema: z.ZodType<RegisterAppResponse>;
     },
   ) {}
 
-  async registerApp(payload: RegisterAppRequest): Promise<unknown | ApiError> {
+  async registerApp(
+    payload: RegisterAppRequest,
+  ): Promise<Result<RegisterAppResponse> | ApiError> {
     try {
-      return await this.f<unknown>('/auth/sign-up/email', {
+      const response = await this.f<unknown>('/auth/sign-up/email', {
         method: 'POST',
         body: payload,
       });
+
+      const validation =
+        this.responseValidator.registerAppResponseSchema.safeParse(response);
+
+      if (!validation.success) {
+        return {
+          kind: 'response-parse',
+          message: 'Failed to parse register app response',
+          issues: validation.error.flatten().fieldErrors,
+        };
+      }
+
+      return { data: validation.data };
     } catch (err: unknown) {
       return this.toApiError(err);
     }
@@ -57,7 +74,7 @@ export class AuthRepository {
     }
   }
 
-  async logout(): Promise<LogoutResponse | ApiError> {
+  async logout(): Promise<Result<LogoutResponse> | ApiError> {
     try {
       const response = await this.f<unknown>('/auth/sign-out', {
         method: 'POST',
@@ -74,17 +91,7 @@ export class AuthRepository {
         };
       }
 
-      return validation.data;
-    } catch (err: unknown) {
-      return this.toApiError(err);
-    }
-  }
-
-  async getUserSession(): Promise<unknown | ApiError> {
-    try {
-      return await this.f<unknown>('/auth/get-session', {
-        method: 'GET',
-      });
+      return { data: validation.data };
     } catch (err: unknown) {
       return this.toApiError(err);
     }

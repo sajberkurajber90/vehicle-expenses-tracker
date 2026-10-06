@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ZodError } from 'zod';
+import Check from '~/components/icons/Check.vue';
+import XMark from '~/components/icons/XMark.vue';
 type Field =
   'email' | 'password' | 'confirmPassword' | 'firstName' | 'lastName';
 
@@ -6,8 +9,11 @@ definePageMeta({
   layout: 'auth',
 });
 
-import { registerAppSchema } from '~/features/auth';
+import { registerAppInputSchema } from '~/features/auth';
 import { useAuthStore } from '~/features/auth';
+import { useDelay } from '~/composables/useDelay';
+
+const { delay } = useDelay();
 
 const authStore = useAuthStore();
 const submitState = ref<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -27,6 +33,7 @@ const errorMessages = reactive({
   confirmPassword: '',
   firstName: '',
   lastName: '',
+  submit: '',
 });
 
 const touchedFields = reactive({
@@ -55,33 +62,35 @@ watch(
 function validate(field: Field) {
   switch (field) {
     case 'email':
-      const emailValidation = registerAppSchema
+      const emailValidation = registerAppInputSchema
         .pick({
           email: true,
         })
         .safeParse({ email: inputForm.email });
       if (!emailValidation.success) {
         errorMessages.email =
-          emailValidation.error.errors[0]?.message || 'Invalid email';
+          emailValidation.error.flatten().fieldErrors.email?.[0] ||
+          'Invalid email';
       } else {
         errorMessages.email = '';
       }
       break;
     case 'password':
-      const passwordValidation = registerAppSchema
+      const passwordValidation = registerAppInputSchema
         .pick({
           password: true,
         })
         .safeParse({ password: inputForm.password });
       if (!passwordValidation.success) {
         errorMessages.password =
+          passwordValidation.error.flatten().fieldErrors.password?.[0] ||
           'min 8 chars, uppercase letter, special char and number';
       } else {
         errorMessages.password = '';
       }
       break;
     case 'confirmPassword':
-      const passwordConformationValidation = registerAppSchema
+      const passwordConformationValidation = registerAppInputSchema
         .pick({
           password: true,
           confirmPassword: true,
@@ -104,27 +113,29 @@ function validate(field: Field) {
       }
       break;
     case 'firstName':
-      const firstNameValidation = registerAppSchema
+      const firstNameValidation = registerAppInputSchema
         .pick({
           firstName: true,
         })
         .safeParse({ firstName: inputForm.firstName });
       if (!firstNameValidation.success) {
         errorMessages.firstName =
-          firstNameValidation.error.errors[0]?.message || 'Invalid first name';
+          firstNameValidation.error.flatten().fieldErrors.firstName?.[0] ||
+          'Invalid first name';
       } else {
         errorMessages.firstName = '';
       }
       break;
     case 'lastName':
-      const lastNameValidation = registerAppSchema
+      const lastNameValidation = registerAppInputSchema
         .pick({
           lastName: true,
         })
         .safeParse({ lastName: inputForm.lastName });
       if (!lastNameValidation.success) {
         errorMessages.lastName =
-          lastNameValidation.error.errors[0]?.message || 'Invalid last name';
+          lastNameValidation.error.flatten().fieldErrors.lastName?.[0] ||
+          'Invalid last name';
       } else {
         errorMessages.lastName = '';
       }
@@ -182,8 +193,38 @@ function onFocus(field: Field) {
 }
 
 async function onSubmit() {
+  Object.keys(touchedFields).forEach((key) => {
+    touchedFields[key as Field] = true;
+  });
   submitState.value = 'submitting';
-  await authStore.registerApp(inputForm);
+  const result = await authStore.registerApp(inputForm);
+  if (result === null) {
+    submitState.value = 'success';
+    await delay(5000);
+    return navigateTo('/login');
+  } else if (result instanceof ZodError) {
+    const flattenedErrors = result.flatten().fieldErrors;
+    const { email, password, firstName, lastName } = flattenedErrors;
+    errorMessages.email = email?.[0] ?? '';
+    errorMessages.password = password?.[0] ?? '';
+    errorMessages.firstName = firstName?.[0] ?? '';
+    errorMessages.lastName = lastName?.[0] ?? '';
+    errorMessages.confirmPassword =
+      'confirmPassword' in flattenedErrors
+        ? ((flattenedErrors.confirmPassword as string[])?.[0] ?? '')
+        : '';
+    submitState.value = 'error';
+  }
+
+  if ('kind' in result) {
+    if (result.kind === 'authorization') {
+      errorMessages.submit = 'App already registered. Please login.';
+    } else {
+      errorMessages.submit = 'Server error, please try again later';
+    }
+    submitState.value = 'error';
+    return;
+  }
   submitState.value = 'idle';
 }
 </script>
@@ -344,12 +385,31 @@ async function onSubmit() {
           </p>
         </div>
       </div>
-      <div class="col-span-3 flex justify-between items-center">
-        <div v-show="submitState === 'idle'"></div>
-        <div
-          v-show="submitState === 'submitting'"
-          class="loading loading-spinner text-success"
-        ></div>
+      <div class="col-span-3 flex items-center">
+        <div class="flex-1">
+          <div
+            v-show="submitState === 'success'"
+            class="flex items-center justify-start space-x-2 text-xs"
+          >
+            <Check />
+            <p>
+              {{
+                'Registration successful! Please confirm your email. Redirecting to login...'
+              }}
+            </p>
+          </div>
+          <div
+            v-show="submitState === 'submitting'"
+            class="loading loading-spinner text-success"
+          ></div>
+          <div
+            v-show="submitState === 'error'"
+            class="text-error text-xs flex justify-start space-x-2 items-center"
+          >
+            <XMark />
+            <p>{{ errorMessages.submit }}</p>
+          </div>
+        </div>
         <button @click="onSubmit" class="btn btn-primary">Register</button>
       </div>
     </form>

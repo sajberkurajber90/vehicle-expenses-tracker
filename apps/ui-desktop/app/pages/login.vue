@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/features/auth';
-// import { loginInputSchema } from '~/features/auth';
+import { useAuthStore, loginInputSchema } from '~/features/auth';
 import { ZodError } from 'zod';
+type Field = 'email' | 'password';
 
 definePageMeta({
   layout: 'auth',
@@ -30,7 +30,74 @@ const touchedFields = reactive({
   password: false,
 });
 
+function validate(field: Field) {
+  switch (field) {
+    case 'email':
+      const emailValidation = loginInputSchema
+        .pick({
+          email: true,
+        })
+        .safeParse({ email: inputForm.email });
+      if (!emailValidation.success) {
+        errorMessages.email =
+          emailValidation.error.flatten().fieldErrors.email?.[0] ??
+          'Invalid email';
+      } else {
+        errorMessages.email = '';
+      }
+      break;
+    case 'password':
+      const passwordValidation = loginInputSchema
+        .pick({
+          password: true,
+        })
+        .safeParse({ password: inputForm.password });
+      if (!passwordValidation.success) {
+        errorMessages.password =
+          passwordValidation.error.flatten().fieldErrors.password?.[0] ??
+          'Password required';
+      } else {
+        errorMessages.password = '';
+      }
+      break;
+  }
+}
+
+function onBlur(field: Field) {
+  switch (field) {
+    case 'email':
+      focusedFields.email = false;
+      if (!touchedFields.email) touchedFields.email = true;
+      validate(field);
+      break;
+    case 'password':
+      focusedFields.password = false;
+      if (!touchedFields.password) touchedFields.password = true;
+      validate(field);
+      break;
+  }
+}
+
+function onFocus(field: Field) {
+  switch (field) {
+    case 'email':
+      focusedFields.email = true;
+      break;
+    case 'password':
+      focusedFields.password = true;
+      break;
+  }
+}
+
 async function submit() {
+  Object.keys(touchedFields).forEach((key) => {
+    touchedFields[key as Field] = true;
+  });
+
+  if (errorMessages.submit !== '') {
+    errorMessages.submit = '';
+  }
+
   const error = await authStore.login(inputForm);
   if (error === null) return navigateTo('/');
 
@@ -43,7 +110,17 @@ async function submit() {
   if ('kind' in error) {
     if (error.kind === 'authentication') {
       errorMessages.submit = 'Email or password incorrect';
+      return;
     }
+
+    if (error.kind === 'authorization') {
+      errorMessages.submit =
+        'User not activated. Please check your email for activation link.';
+      return;
+    }
+
+    errorMessages.submit =
+      'An unexpected error occurred. Please try again later.';
   }
 }
 </script>
@@ -71,6 +148,9 @@ async function submit() {
                     v-model="inputForm.email"
                     placeholder="Email"
                     class="input w-full"
+                    @keyup="touchedFields.email ? validate('email') : null"
+                    @focus="onFocus('email')"
+                    @blur="onBlur('email')"
                     :class="{
                       'text-error': errorMessages.email,
                       'input-error': errorMessages.email,
@@ -96,6 +176,11 @@ async function submit() {
                     placeholder="Password"
                     class="input w-full"
                     v-model="inputForm.password"
+                    @keyup="
+                      touchedFields.password ? validate('password') : null
+                    "
+                    @focus="onFocus('password')"
+                    @blur="onBlur('password')"
                     :class="{
                       'text-error': errorMessages.password,
                       'input-error': errorMessages.password,

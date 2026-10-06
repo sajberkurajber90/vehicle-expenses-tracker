@@ -8,7 +8,7 @@ type RoutePolicy = {
 };
 
 export default function resolveAppState(
-  session: AuthUserResponse | null, // TODO: Replace with IUserSession | null when the session is typed
+  session: AuthUserResponse | null,
   isRegisterComplete: boolean,
 ): AppState {
   if (!isRegisterComplete) {
@@ -28,7 +28,7 @@ export const policies: Record<AppState, RoutePolicy> = {
     redirectTo: '/register-app',
   },
   'needs-login': {
-    allow: (path) => path === '/login' || path === '/verify-email/',
+    allow: (path) => path === '/login' || path === '/verify-email',
     redirectTo: '/login',
   },
   authenticated: {
