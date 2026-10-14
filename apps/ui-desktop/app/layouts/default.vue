@@ -4,7 +4,7 @@ import Sidebar from '~/components/sidebar/Sidebar.vue';
 
 <template>
   <div
-    class="w-[1920px] m-auto pt-4 pb-4 h-screen overflow-y-auto overflow-x-auto"
+    class="w-[1920px] m-auto pt-4 pb-4 h-screen min-h-270 overflow-y-auto overflow-x-auto"
   >
     <div class="flex flex-col h-full gap-4">
       <div class="h-16 w-full bg-primary-content/10 rounded"></div>

@@ -5,7 +5,7 @@ import { Result } from '@modules/shared/result.ts';
 import { NotFoundError } from '@modules/shared/errors.ts';
 import { User } from '@infrastructure/db/types/user.ts';
 
-class UserRepository {
+export class UserRepository {
   constructor(private readonly db: Kysely<Database>) {}
 
   async getUserById(userId: number): Promise<Result<User, NotFoundError>> {

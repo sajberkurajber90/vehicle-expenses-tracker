@@ -8,7 +8,7 @@ import auth from './config.ts';
 
 import { fromNodeHeaders } from 'better-auth/node';
 
-function route(
+function authRoutes(
   instance: FastifyInstance,
   _: RegisterOptions,
   done: HookHandlerDoneFunction,
@@ -49,4 +49,4 @@ function route(
   done();
 }
 
-export default route;
+export default authRoutes;

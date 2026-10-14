@@ -1,12 +1,16 @@
-import { pool } from '@infrastructure/db/index.ts';
-import { sendMail } from '@infrastructure/mail/index.ts';
-import { betterAuth } from 'better-auth';
+import db, { pool } from '@infrastructure/db/index.ts';
+import { betterAuth, type ModelNames } from 'better-auth';
+import { redis } from '@infrastructure/redis/index.ts';
+import {
+  disableSignUp,
+  appRegisterComplete,
+  initialSignUp,
+} from './auth.services.ts';
+import { authRepository } from './auth.repository.ts';
+import { authorizationRepository } from '@modules/authorization/authorization.repository.ts';
+import { signUpRequestSchema, signUpResponseSchema } from './auth.schemas.ts';
 
-import { canSignUp, appRegisterComplete } from './services.ts';
-
-const auth = betterAuth({
-  plugins: [canSignUp(), appRegisterComplete()],
-  database: pool,
+const sharedOptions = {
   secret: process.env.BETTER_AUTH_SECRET,
   basePath: '/auth',
   baseURL: `https://${process.env.API_PREFIX}.${process.env.BASE_URL}`,
@@ -14,6 +18,28 @@ const auth = betterAuth({
     `https://${process.env.BASE_URL}`,
     `https://${process.env.UI_MOBILE_PREFIX}.${process.env.BASE_URL}`,
   ],
+  emailVerification: {
+    sendOnSignIn: false,
+  },
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+  },
+  advanced: {
+    database: {
+      // generate uuid only for non-user tabel
+      generateId: (options: {
+        model: ModelNames;
+        size?: number | undefined;
+      }) => {
+        if (options.model === 'users' || options.model === 'user') {
+          return false;
+        }
+
+        return crypto.randomUUID();
+      },
+    },
+  },
   user: {
     modelName: 'users',
     fields: {
@@ -44,17 +70,6 @@ const auth = betterAuth({
       },
     },
   },
-  session: {
-    modelName: 'sessions',
-    fields: {
-      userId: 'user_id',
-      expiresAt: 'expires_at',
-      ipAddress: 'ip_address',
-      userAgent: 'user_agent',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
-  },
   account: {
     modelName: 'accounts',
     fields: {
@@ -70,6 +85,68 @@ const auth = betterAuth({
       updatedAt: 'updated_at',
     },
   },
+} as const;
+
+export type BetterAuthSharedOptions = typeof sharedOptions;
+
+console.log('BetterAuthSharedOptions', sharedOptions);
+
+const auth = betterAuth({
+  plugins: [
+    disableSignUp(),
+    appRegisterComplete(),
+    initialSignUp(db, sharedOptions, authRepository, authorizationRepository, {
+      request: signUpRequestSchema,
+      response: signUpResponseSchema,
+    }),
+  ],
+  database: pool,
+  secret: sharedOptions.secret,
+  basePath: sharedOptions.basePath,
+  baseURL: sharedOptions.baseURL,
+  trustedOrigins: [
+    `https://${process.env.BASE_URL}`,
+    `https://${process.env.UI_MOBILE_PREFIX}.${process.env.BASE_URL}`,
+  ],
+  secondaryStorage: {
+    get: async (key) => {
+      return await redis.get(key);
+    },
+    getAndDelete: async (key) => {
+      return await redis.getDel(key);
+    },
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, { EX: ttl });
+      else await redis.set(key, value);
+    },
+    async increment(key, ttl) {
+      if (!Number.isInteger(ttl) || ttl <= 0) {
+        throw new TypeError('Redis increment TTL must be a positive integer');
+      }
+      const [value] = await redis
+        .multi()
+        .incr(key)
+        .expire(key, ttl, 'NX')
+        .execTyped();
+      return value;
+    },
+    delete: async (key) => {
+      await redis.del(key);
+    },
+  },
+  user: sharedOptions.user,
+  session: {
+    modelName: 'sessions',
+    fields: {
+      userId: 'user_id',
+      expiresAt: 'expires_at',
+      ipAddress: 'ip_address',
+      userAgent: 'user_agent',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+  },
+  account: sharedOptions.account,
   verification: {
     modelName: 'verifications',
     fields: {
@@ -78,22 +155,8 @@ const auth = betterAuth({
       updatedAt: 'updated_at',
     },
   },
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: true,
-  },
-  emailVerification: {
-    sendOnSignIn: true,
-    sendVerificationEmail: async ({ user, token }, request) => {
-      const url = `https://${process.env.BASE_URL}/verify-email?token=${token}`;
-      await sendMail(
-        user.email,
-        'Email Verification',
-        `<h2>Dear ${user.name}</h2>
-              <p>Please verify your email by clicking the following link: <a href="${url}">Verify</a></p>`,
-      );
-    },
-  },
+  emailAndPassword: sharedOptions.emailAndPassword,
+  emailVerification: sharedOptions.emailVerification,
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
@@ -105,17 +168,9 @@ const auth = betterAuth({
       secure: true,
       httpOnly: true,
     },
-    database: {
-      // generate uuid only for non-user tabel
-      generateId: (options) => {
-        if (options.model === 'users' || options.model === 'user') {
-          return false;
-        }
-
-        return crypto.randomUUID();
-      },
-    },
+    database: sharedOptions.advanced.database,
   },
 });
 
+export type BetterAuthClient = typeof auth;
 export default auth;

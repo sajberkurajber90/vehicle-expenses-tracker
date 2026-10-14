@@ -36,3 +36,13 @@ export class ValidationError extends ApiError {
     super(message, 400);
   }
 }
+
+export class InfrastructureError extends ApiError {
+  readonly code = 'INFRASTRUCTURE_ERROR';
+  constructor(
+    message: string,
+    public origin?: string,
+  ) {
+    super(message, 500);
+  }
+}

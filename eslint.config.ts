@@ -15,6 +15,7 @@ export default defineConfig([
     files: ['apps/api-core/**/*.ts'],
     rules: {
       'no-console': ['error', { allow: ['warn', 'error'] }],
+      'import/no-cycle': ['error', { maxDepth: 1 }],
     },
   },
   tseslint.configs.recommended,

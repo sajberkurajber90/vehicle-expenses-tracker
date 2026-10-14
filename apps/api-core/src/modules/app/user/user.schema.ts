@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-export const userSchema = z.object({
+export const userResponseSchema = z.object({
   id: z.coerce.number(),
   email: z.string().email(),
   name: z.string(),
@@ -12,4 +12,4 @@ export const userSchema = z.object({
   deletedAt: z.coerce.date().nullable(),
 });
 
-export type IUser = z.infer<typeof userSchema>;
+export type IUser = z.infer<typeof userResponseSchema>;
