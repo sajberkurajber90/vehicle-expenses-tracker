@@ -1,11 +1,18 @@
 import fastify from 'fastify';
 import cors from '@fastify/cors';
-const server = fastify();
-
 // routes
 import authRoutes from '@modules/auth/auth.routes.ts';
 import dashboardRoute from '@modules/dashboard/dashboard.routes.ts';
 import authorizationRoute from '@modules/authorization/authorization.routes.ts';
+import {
+  hasZodFastifySchemaValidationErrors,
+  serializerCompiler,
+  validatorCompiler,
+} from 'fastify-type-provider-zod';
+
+const server = fastify();
+server.setValidatorCompiler(validatorCompiler);
+server.setSerializerCompiler(serializerCompiler);
 
 server
   .register(cors, {
@@ -19,7 +26,13 @@ server
     maxAge: 86400,
   })
   .setErrorHandler((error, request, reply) => {
-    console.log(error);
+    if (hasZodFastifySchemaValidationErrors(error)) {
+      return reply.code(400).send({
+        error: 'Invalid request data',
+        message: 'Request does not match the expected schema',
+        details: error.validation,
+      });
+    }
     if (error instanceof Error) {
       return reply.status(400).send({ error: error.message });
     }

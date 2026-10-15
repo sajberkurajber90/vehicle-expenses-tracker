@@ -89,8 +89,6 @@ const sharedOptions = {
 
 export type BetterAuthSharedOptions = typeof sharedOptions;
 
-console.log('BetterAuthSharedOptions', sharedOptions);
-
 const auth = betterAuth({
   plugins: [
     disableSignUp(),

@@ -120,6 +120,7 @@ export function initialSignUp(
       ],
     },
     endpoints: {
+      // TODO: instead of throwing an error try to return a proper error response with the correct status code and message
       initialSignUp: createAuthEndpoint(
         '/initial-sign-up',
         {
@@ -136,12 +137,12 @@ export function initialSignUp(
           }
 
           const trx = await db.startTransaction().execute();
-
           const newUserRaw = await repository.initialize(
             input.data,
             trx,
             sharedOptions,
           );
+
           if (!newUserRaw.ok) {
             await trx.rollback().execute();
             throw new APIError('INTERNAL_SERVER_ERROR', {
@@ -151,9 +152,10 @@ export function initialSignUp(
           }
 
           const newUser = validator.response.safeParse(newUserRaw.value);
+
           if (!newUser.success) {
             await trx.rollback().execute();
-            throw new APIError('CONFLICT', {
+            throw new APIError('INTERNAL_SERVER_ERROR', {
               message: 'Failed to parse better-auth sign-up response',
               details: newUser.error.flatten().fieldErrors,
             });
@@ -163,9 +165,10 @@ export function initialSignUp(
             'admin',
             trx,
           );
+
           if (!roleId.ok) {
             await trx.rollback().execute();
-            throw new APIError('CONFLICT', {
+            throw new APIError('INTERNAL_SERVER_ERROR', {
               message: roleId.error.message,
               details: roleId.error.origin,
             });
@@ -177,6 +180,7 @@ export function initialSignUp(
               roleId.value.id,
               trx,
             );
+
           if (!allocateUserRole.ok) {
             await trx.rollback().execute();
             throw new APIError('INTERNAL_SERVER_ERROR', {

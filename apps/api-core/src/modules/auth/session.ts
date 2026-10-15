@@ -6,6 +6,7 @@ import {
   type SessionResponse,
   sessionResponseSchema,
 } from '@modules/auth/auth.schemas.ts';
+import { ValidationError } from '@modules/shared/errors.ts';
 
 function sessionFactory(
   auth: BetterAuthClient,
@@ -26,9 +27,9 @@ function sessionFactory(
 
     const validation = validator.safeParse(session);
     if (!validation.success) {
-      return await reply
-        .status(400)
-        .send({ error: 'Response Validation Error' });
+      return await reply.status(400).send({
+        error: new ValidationError('failed to parse session', 'session - hook'),
+      });
     }
   };
 }

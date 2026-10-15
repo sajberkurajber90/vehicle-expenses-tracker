@@ -9,7 +9,8 @@ import {
   IAuthorizationService,
 } from '@modules/authorization/authorization.services.ts';
 import session from '@modules/auth/session.ts';
-
+import z from 'zod';
+import { ZodTypeProvider } from 'fastify-type-provider-zod';
 function authorizationRouteFactory(
   session: SessionMiddleware,
   service: IAuthorizationService,
@@ -20,10 +21,20 @@ function authorizationRouteFactory(
     done: HookHandlerDoneFunction,
   ) {
     instance
+      .withTypeProvider<ZodTypeProvider>()
       .addHook('onRequest', session)
-      .get('/user/:id', async (request, reply) => {
-        await reply.send({ hello: 'kurac' });
-      });
+      .get(
+        '/user/:id',
+        {
+          schema: {
+            params: z.object({ id: z.coerce.number().int().positive() }),
+          },
+        },
+        async (request, reply) => {
+          const { id } = request.params;
+          await reply.send({ hello: `test ${id}` });
+        },
+      );
 
     done();
   };

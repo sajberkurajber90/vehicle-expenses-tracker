@@ -18,7 +18,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       },
     );
 
-    console.log('session', session.value, sessionError.value);
 
     if (session.value === null) {
       const { data: response, error: appRegisterError } =
