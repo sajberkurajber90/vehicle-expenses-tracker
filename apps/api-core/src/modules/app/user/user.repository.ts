@@ -8,8 +8,11 @@ import { User } from '@infrastructure/db/types/user.ts';
 export class UserRepository {
   constructor(private readonly db: Kysely<Database>) {}
 
-  async getUserById(userId: number): Promise<Result<User, NotFoundError>> {
-    const response = await this.db
+  async findUserById(
+    userId: number,
+    trx?: Kysely<Database>,
+  ): Promise<Result<User, NotFoundError>> {
+    const response = await (trx || this.db)
       .selectFrom('users')
       .selectAll()
       .where('id', '=', userId)

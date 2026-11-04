@@ -4,6 +4,7 @@ import { fromNodeHeaders } from 'better-auth/node';
 import z from 'zod';
 import {
   type SessionResponse,
+  type AuthUserResponse,
   sessionResponseSchema,
 } from '@modules/auth/auth.schemas.ts';
 import { ValidationError } from '@modules/shared/errors.ts';
@@ -31,6 +32,7 @@ function sessionFactory(
         error: new ValidationError('failed to parse session', 'session - hook'),
       });
     }
+    request.setDecorator<AuthUserResponse>('user', validation.data.user);
   };
 }
 export type SessionMiddleware = ReturnType<typeof sessionFactory>;

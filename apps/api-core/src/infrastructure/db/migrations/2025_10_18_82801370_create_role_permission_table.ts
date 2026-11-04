@@ -4,7 +4,7 @@ export async function up(db: Kysely<never>): Promise<void> {
   await db.schema
     .createTable('role_permission')
     .addColumn('role_id', 'integer', (col) =>
-      col.references('authorization.id').notNull(),
+      col.references('roles.id').notNull(),
     )
     .addColumn('permission_id', 'integer', (col) =>
       col.references('permissions.id').notNull(),

@@ -17,6 +17,16 @@ export class NotFoundError extends ApiError {
   }
 }
 
+export class UnauthorizedError extends ApiError {
+  readonly code = 'UNAUTHORIZED';
+  constructor(
+    message: string,
+    public origin?: string,
+  ) {
+    super(message, 403);
+  }
+}
+
 export class AuthorizationError extends ApiError {
   readonly code = 'PERMISSION_DENIED';
   constructor(

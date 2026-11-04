@@ -2,7 +2,7 @@ import * as z from 'zod';
 
 const authUserResponseSchema = z.object({
   id: z.coerce.number(),
-  email: z.string().email(),
+  email: z.email(),
   name: z.string(),
   firstName: z.string(),
   lastName: z.string(),
@@ -13,7 +13,7 @@ const authUserResponseSchema = z.object({
 });
 
 const authUserSessionResponseSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   userId: z.coerce.number(),
@@ -29,9 +29,10 @@ export const sessionResponseSchema = z.object({
 });
 
 export type SessionResponse = z.infer<typeof sessionResponseSchema>;
+export type AuthUserResponse = z.infer<typeof authUserResponseSchema>;
 
 export const signUpRequestSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z
     .string()
     .min(8)

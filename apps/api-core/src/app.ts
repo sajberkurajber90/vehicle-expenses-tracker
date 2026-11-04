@@ -26,6 +26,7 @@ server
     maxAge: 86400,
   })
   .setErrorHandler((error, request, reply) => {
+    console.log('error', error);
     if (hasZodFastifySchemaValidationErrors(error)) {
       return reply.code(400).send({
         error: 'Invalid request data',
@@ -33,8 +34,9 @@ server
         details: error.validation,
       });
     }
+
     if (error instanceof Error) {
-      return reply.status(400).send({ error: error.message });
+      return reply.status(500).send({ error: error.message });
     }
 
     reply.status(500).send({ error: 'Internal Server Error' });

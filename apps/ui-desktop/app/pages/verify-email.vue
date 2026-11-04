@@ -7,7 +7,7 @@ definePageMeta({
 const route = useRoute();
 const { token } = route.query;
 
-const fetch = useAPI();
+const { fetch } = useAPI();
 
 const { status } = useAsyncData(() =>
   fetch('/auth/verify-email', {

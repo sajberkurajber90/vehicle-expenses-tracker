@@ -6,7 +6,7 @@ import {
   type RegisterAppResponse,
 } from '~/features/auth/auth.schema';
 
-import type { z } from 'zod';
+import { z } from 'zod';
 import { type ApiError } from '~/utils/error';
 import type { Result } from '~/utils/result';
 type APIFetch = typeof $fetch;
@@ -38,7 +38,7 @@ export class AuthRepository {
         return {
           kind: 'response-parse',
           message: 'Failed to parse register app response',
-          issues: validation.error.flatten().fieldErrors,
+          issues: z.flattenError(validation.error).fieldErrors,
         };
       }
 
@@ -62,7 +62,7 @@ export class AuthRepository {
         return {
           kind: 'response-parse',
           message: 'Failed to parse login response',
-          issues: validation.error.flatten().fieldErrors,
+          issues: z.flattenError(validation.error).fieldErrors,
         };
       }
 
@@ -87,7 +87,7 @@ export class AuthRepository {
         return {
           kind: 'response-parse',
           message: 'Failed to parse logout response',
-          issues: validation.error.flatten().fieldErrors,
+          issues: z.flattenError(validation.error).fieldErrors,
         };
       }
 

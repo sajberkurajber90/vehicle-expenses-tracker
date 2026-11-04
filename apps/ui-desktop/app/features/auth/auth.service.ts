@@ -44,7 +44,6 @@ export class AuthService {
     return await this.repo.logout();
   }
 
-  async signUpUser() {}
   async resetPassword(email: string) {}
 }
 

@@ -3,7 +3,7 @@ import { z } from 'zod';
 // user session
 export const authUserResponseSchema = z.object({
   id: z.coerce.number(),
-  email: z.string().email(),
+  email: z.email(),
   emailVerified: z.boolean(),
   firstName: z.string(),
   lastName: z.string(),
@@ -14,7 +14,7 @@ export const authUserResponseSchema = z.object({
 });
 
 export const authSessionResponseSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   userId: z.coerce.number(),
   token: z.string(),
   expiresAt: z.coerce.date(),
@@ -24,10 +24,12 @@ export const authSessionResponseSchema = z.object({
   updatedAt: z.coerce.date(),
 });
 
-export const authUserSessionResponseSchema = z.object({
-  user: authUserResponseSchema,
-  session: authSessionResponseSchema,
-});
+export const authUserSessionResponseSchema = z
+  .object({
+    user: authUserResponseSchema,
+    session: authSessionResponseSchema,
+  })
+  .nullable();
 
 export type AuthUserResponse = z.infer<typeof authUserResponseSchema>;
 export type AuthSessionResponse = z.infer<typeof authSessionResponseSchema>;
@@ -37,7 +39,7 @@ export type AuthUserSessionResponse = z.infer<
 
 // login
 export const loginInputSchema = z.object({
-  email: z.string().nonempty({ message: 'Email is required' }).email(),
+  email: z.email().nonempty({ message: 'Email is required' }),
   password: z.string().nonempty({ message: 'Password is required' }),
 });
 
@@ -58,7 +60,7 @@ export type LogoutResponse = z.infer<typeof logoutResponseSchema>;
 
 // register app
 export const registerAppInputSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z
     .string()
     .min(8)

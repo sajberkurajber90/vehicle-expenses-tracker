@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { useAuthStore, loginInputSchema } from '~/features/auth';
-import { ZodError } from 'zod';
+import { useAuthStore } from '~/features/auth/auth.store';
+import { loginInputSchema } from '~/features/auth/auth.schema';
+import { ZodError, z } from 'zod';
+import { useAuthorizationStore } from '~/features/authorization/authorization.store';
 type Field = 'email' | 'password';
 
 definePageMeta({
@@ -8,6 +10,9 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
+const { login } = authStore;
+const { sessionUser } = storeToRefs(authStore);
+const authorizationStore = useAuthorizationStore();
 
 const inputForm = reactive({
   email: '',
@@ -40,7 +45,7 @@ function validate(field: Field) {
         .safeParse({ email: inputForm.email });
       if (!emailValidation.success) {
         errorMessages.email =
-          emailValidation.error.flatten().fieldErrors.email?.[0] ??
+          z.flattenError(emailValidation.error).fieldErrors.email?.[0] ??
           'Invalid email';
       } else {
         errorMessages.email = '';
@@ -54,7 +59,7 @@ function validate(field: Field) {
         .safeParse({ password: inputForm.password });
       if (!passwordValidation.success) {
         errorMessages.password =
-          passwordValidation.error.flatten().fieldErrors.password?.[0] ??
+          z.flattenError(passwordValidation.error).fieldErrors.password?.[0] ??
           'Password required';
       } else {
         errorMessages.password = '';
@@ -98,11 +103,31 @@ async function submit() {
     errorMessages.submit = '';
   }
 
-  const error = await authStore.login(inputForm);
-  if (error === null) return navigateTo('/');
+  const error = await login(inputForm);
+  // TODO: refactor the logic
+  if (error === null) {
+    if (sessionUser.value !== null) {
+      const errorRole = await authorizationStore.getSessionRole(
+        sessionUser.value.id,
+      );
+      if (errorRole === null) {
+        return navigateTo('/');
+      }
+
+      if ('kind' in errorRole) {
+        if ('kind' in errorRole) {
+          errorMessages.submit =
+            'An unexpected error occurred while fetching user role. Please try again later.';
+          return;
+        }
+      }
+    }
+
+    return navigateTo('/');
+  }
 
   if (error instanceof ZodError) {
-    const { email, password } = error.flatten().fieldErrors;
+    const { email, password } = z.flattenError(error).fieldErrors;
     errorMessages.email = email?.[0] ?? '';
     errorMessages.password = password?.[0] ?? '';
   }

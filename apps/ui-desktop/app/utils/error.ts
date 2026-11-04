@@ -14,7 +14,7 @@ type BaseError = {
 
 export type ValidationErr = BaseError & {
   kind: 'validation';
-  issues: Record<string, string[]>;
+  issues: Partial<Record<string, string[]>>;
 };
 
 export type NotFoundErr = BaseError & {
@@ -42,7 +42,7 @@ export type InfrastructureErr = BaseError & {
 
 export type ResponseParseErr = BaseError & {
   kind: 'response-parse';
-  issues: Record<string, string[]>;
+  issues: Partial<Record<string, string[]>>;
 };
 
 export type ApiError =

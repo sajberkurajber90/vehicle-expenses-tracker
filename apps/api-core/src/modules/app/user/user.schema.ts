@@ -2,7 +2,7 @@ import * as z from 'zod';
 
 export const userResponseSchema = z.object({
   id: z.coerce.number(),
-  email: z.string().email(),
+  email: z.email(),
   name: z.string(),
   firstName: z.string(),
   lastName: z.string(),

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ZodError } from 'zod';
+import { ZodError, z } from 'zod';
 import Check from '~/components/icons/Check.vue';
 import XMark from '~/components/icons/XMark.vue';
 type Field =
@@ -9,8 +9,8 @@ definePageMeta({
   layout: 'auth',
 });
 
-import { registerAppInputSchema } from '~/features/auth';
-import { useAuthStore } from '~/features/auth';
+import { registerAppInputSchema } from '~/features/auth/auth.schema';
+import { useAuthStore } from '~/features/auth/auth.store';
 import { useDelay } from '~/composables/useDelay';
 
 const { delay } = useDelay();
@@ -69,7 +69,7 @@ function validate(field: Field) {
         .safeParse({ email: inputForm.email });
       if (!emailValidation.success) {
         errorMessages.email =
-          emailValidation.error.flatten().fieldErrors.email?.[0] ||
+          z.flattenError(emailValidation.error).fieldErrors.email?.[0] ||
           'Invalid email';
       } else {
         errorMessages.email = '';
@@ -83,7 +83,7 @@ function validate(field: Field) {
         .safeParse({ password: inputForm.password });
       if (!passwordValidation.success) {
         errorMessages.password =
-          passwordValidation.error.flatten().fieldErrors.password?.[0] ||
+          z.flattenError(passwordValidation.error).fieldErrors.password?.[0] ||
           'min 8 chars, uppercase letter, special char and number';
       } else {
         errorMessages.password = '';
@@ -105,9 +105,8 @@ function validate(field: Field) {
         });
       if (!passwordConformationValidation.success) {
         errorMessages.confirmPassword =
-          passwordConformationValidation.error.errors.find(
-            (e) => e.code === 'custom',
-          )?.message || "Passwords don't match";
+          z.flattenError(passwordConformationValidation.error).fieldErrors
+            .confirmPassword?.[0] || "Passwords don't match";
       } else {
         errorMessages.confirmPassword = '';
       }
@@ -120,8 +119,8 @@ function validate(field: Field) {
         .safeParse({ firstName: inputForm.firstName });
       if (!firstNameValidation.success) {
         errorMessages.firstName =
-          firstNameValidation.error.flatten().fieldErrors.firstName?.[0] ||
-          'Invalid first name';
+          z.flattenError(firstNameValidation.error).fieldErrors
+            .firstName?.[0] || 'Invalid first name';
       } else {
         errorMessages.firstName = '';
       }
@@ -134,7 +133,7 @@ function validate(field: Field) {
         .safeParse({ lastName: inputForm.lastName });
       if (!lastNameValidation.success) {
         errorMessages.lastName =
-          lastNameValidation.error.flatten().fieldErrors.lastName?.[0] ||
+          z.flattenError(lastNameValidation.error).fieldErrors.lastName?.[0] ||
           'Invalid last name';
       } else {
         errorMessages.lastName = '';
@@ -203,7 +202,7 @@ async function onSubmit() {
     await delay(5000);
     return navigateTo('/login');
   } else if (result instanceof ZodError) {
-    const flattenedErrors = result.flatten().fieldErrors;
+    const flattenedErrors = z.flattenError(result).fieldErrors;
     const { email, password, firstName, lastName } = flattenedErrors;
     errorMessages.email = email?.[0] ?? '';
     errorMessages.password = password?.[0] ?? '';

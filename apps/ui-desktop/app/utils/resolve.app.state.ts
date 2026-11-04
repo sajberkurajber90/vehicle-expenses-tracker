@@ -1,4 +1,4 @@
-import type { AuthUserResponse } from '~/features/auth';
+import type { AuthUserResponse } from '~/features/auth/auth.schema';
 
 type AppState = 'unregistered' | 'needs-login' | 'authenticated';
 

@@ -11,8 +11,14 @@ import {
 import session from '@modules/auth/session.ts';
 import z from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import hasPermission, {
+  type PermissionMiddleware,
+} from '@modules/authorization/hasPermison.ts';
+import { querySchema } from '@modules/shared/schema.ts';
+
 function authorizationRouteFactory(
   session: SessionMiddleware,
+  permission: PermissionMiddleware,
   service: IAuthorizationService,
 ) {
   return function (
@@ -20,24 +26,64 @@ function authorizationRouteFactory(
     _: RegisterOptions,
     done: HookHandlerDoneFunction,
   ) {
-    instance
+    const base = instance
+      .decorateRequest('user', null)
       .withTypeProvider<ZodTypeProvider>()
-      .addHook('onRequest', session)
-      .get(
-        '/user/:id',
-        {
-          schema: {
-            params: z.object({ id: z.coerce.number().int().positive() }),
-          },
+      .addHook('onRequest', session);
+
+    base.get(
+      '/user/:id/roles',
+      {
+        schema: {
+          params: z.object({ id: z.coerce.number().int().positive() }),
         },
-        async (request, reply) => {
-          const { id } = request.params;
-          await reply.send({ hello: `test ${id}` });
+        preHandler: permission<{ id: number }>(
+          'read',
+          'role',
+          (request) => request.params.id,
+          'users',
+        ),
+      },
+      async (request, reply) => {
+        const { id } = request.params;
+        const response = await service.findRoleByUserId(id);
+        await reply.send(response.ok ? response.value : response.error);
+      },
+    );
+
+    base.get(
+      '/user/:id/permissions',
+      {
+        schema: {
+          querystring: querySchema,
+          params: z.object({
+            id: z.coerce.number().int().positive(),
+          }),
         },
-      );
+        preHandler: permission<{ id: number }>(
+          'read',
+          'permission',
+          (request) => request.params.id,
+          'users',
+        ),
+      },
+      async (request, reply) => {
+        const { id } = request.params;
+        const p = await service.findPermissionsByUserId(id, request.query);
+        await reply.send(
+          p.ok
+            ? { data: p.value, next: p.nextCursor, prev: p.previousCursor }
+            : p.error,
+        );
+      },
+    );
 
     done();
   };
 }
 
-export default authorizationRouteFactory(session, authorizationService);
+export default authorizationRouteFactory(
+  session,
+  hasPermission,
+  authorizationService,
+);
