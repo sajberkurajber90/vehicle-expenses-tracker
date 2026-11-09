@@ -1,26 +1,10 @@
-import type { AuthUserResponse } from '~/features/auth/auth.schema';
-
-type AppState = 'unregistered' | 'needs-login' | 'authenticated';
+export type AppState =
+  'unregistered' | 'needs-login' | 'authenticated' | 'error';
 
 type RoutePolicy = {
   allow: (path: string) => boolean;
   redirectTo: string;
 };
-
-export default function resolveAppState(
-  session: AuthUserResponse | null,
-  isRegisterComplete: boolean,
-): AppState {
-  if (!isRegisterComplete) {
-    return 'unregistered';
-  }
-
-  if (session === null) {
-    return 'needs-login';
-  }
-
-  return 'authenticated';
-}
 
 export const policies: Record<AppState, RoutePolicy> = {
   unregistered: {
@@ -28,12 +12,16 @@ export const policies: Record<AppState, RoutePolicy> = {
     redirectTo: '/register-app',
   },
   'needs-login': {
-    allow: (path) => path === '/login' || path === '/verify-email',
+    allow: (path) => ['/login', '/verify-email'].includes(path),
     redirectTo: '/login',
   },
   authenticated: {
     allow: (path) =>
-      path !== '/login' && path !== '/register-app' && path !== '/verify-email',
+      !['/login', '/register-app', '/verify-email'].includes(path),
     redirectTo: '/',
+  },
+  error: {
+    allow: (path) => path === '/error',
+    redirectTo: '/error',
   },
 };

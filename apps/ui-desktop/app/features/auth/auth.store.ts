@@ -36,14 +36,21 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   const sessionUser = ref<null | AuthUserResponse>(null);
+  const appRegistered = ref<boolean>(false);
 
   function setSession(user: AuthUserResponse | null) {
     sessionUser.value = user;
   }
 
+  function setAppRegistered(registered: boolean) {
+    appRegistered.value = registered;
+  }
+
   async function registerApp(payload: RegisterAppInput) {
     const result = await service.registerApp(payload);
-
+    if ('data' in result) {
+      appRegistered.value = true;
+    }
     return 'data' in result ? null : result;
   }
 
@@ -53,7 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
     // set active sessionUser if login was successful
     if ('data' in result) {
       sessionUser.value = result.data.user;
-      return null;
+      return result.data.user;
     }
 
     return result;
@@ -74,8 +81,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
+    appRegistered,
     sessionUser,
     setSession,
+    setAppRegistered,
     registerApp,
     login,
     logout,

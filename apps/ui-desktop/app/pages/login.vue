@@ -2,7 +2,7 @@
 import { useAuthStore } from '~/features/auth/auth.store';
 import { loginInputSchema } from '~/features/auth/auth.schema';
 import { ZodError, z } from 'zod';
-import { useAuthorizationStore } from '~/features/authorization/authorization.store';
+import { initStores } from '~/utils/init.stores';
 type Field = 'email' | 'password';
 
 definePageMeta({
@@ -11,8 +11,6 @@ definePageMeta({
 
 const authStore = useAuthStore();
 const { login } = authStore;
-const { sessionUser } = storeToRefs(authStore);
-const authorizationStore = useAuthorizationStore();
 
 const inputForm = reactive({
   email: '',
@@ -103,42 +101,29 @@ async function submit() {
     errorMessages.submit = '';
   }
 
-  const error = await login(inputForm);
-  // TODO: refactor the logic
-  if (error === null) {
-    if (sessionUser.value !== null) {
-      const errorRole = await authorizationStore.getSessionRole(
-        sessionUser.value.id,
-      );
-      if (errorRole === null) {
-        return navigateTo('/');
-      }
-
-      if ('kind' in errorRole) {
-        if ('kind' in errorRole) {
-          errorMessages.submit =
-            'An unexpected error occurred while fetching user role. Please try again later.';
-          return;
-        }
-      }
+  const loginResponse = await login(inputForm);
+  if ('id' in loginResponse) {
+    const initError = await initStores(loginResponse.id);
+    if (initError) {
+      return navigateTo('/error');
     }
 
     return navigateTo('/');
   }
 
-  if (error instanceof ZodError) {
-    const { email, password } = z.flattenError(error).fieldErrors;
+  if (loginResponse instanceof ZodError) {
+    const { email, password } = z.flattenError(loginResponse).fieldErrors;
     errorMessages.email = email?.[0] ?? '';
     errorMessages.password = password?.[0] ?? '';
   }
 
-  if ('kind' in error) {
-    if (error.kind === 'authentication') {
+  if ('kind' in loginResponse) {
+    if (loginResponse.kind === 'authentication') {
       errorMessages.submit = 'Email or password incorrect';
       return;
     }
 
-    if (error.kind === 'authorization') {
+    if (loginResponse.kind === 'authorization') {
       errorMessages.submit =
         'User not activated. Please check your email for activation link.';
       return;

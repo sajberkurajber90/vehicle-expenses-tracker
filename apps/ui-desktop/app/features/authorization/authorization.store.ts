@@ -6,6 +6,7 @@ import {
   roleResponseSchema,
 } from '~/features/authorization/authorization.schema';
 import { AuthorizationService } from '~/features/authorization/authorization.service';
+import { useAuthStore } from '~/features/auth/auth.store';
 
 export const useAuthorizationStore = defineStore('authorization', () => {
   const { fetch } = useAPI();
@@ -14,6 +15,14 @@ export const useAuthorizationStore = defineStore('authorization', () => {
       roleResponseSchema: roleResponseSchema,
     }),
   );
+
+  const authStore = useAuthStore();
+
+  authStore.$subscribe(async (mutation, state) => {
+    if (!state.sessionUser) {
+      await cleanUpOnLogout();
+    }
+  });
 
   const sessionRole = ref<null | RoleResponse>(null);
   const sessionPermissions = ref<null | PermissionResponse[]>(null);

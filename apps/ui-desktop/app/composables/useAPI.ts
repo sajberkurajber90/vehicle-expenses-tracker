@@ -1,10 +1,10 @@
 import { useAuthStore } from '~/features/auth/auth.store';
 import { z } from 'zod';
 import { toApiError, type ApiError } from '~/utils/error';
-import { cursorSchema, type CursorSchemaType } from '~/utils/result';
+import { type CursorSchemaType } from '~/utils/result';
 export function useAPI() {
   const config = useRuntimeConfig();
-  const { cleanUpOnLogout } = useAuthStore();
+  const authStore = useAuthStore();
 
   const fetch = $fetch.create({
     baseURL: import.meta.server
@@ -23,7 +23,7 @@ export function useAPI() {
       // only on client side - for redirect purposes
       if (import.meta.client && response.status === 401) {
         await navigateTo('/login');
-        await cleanUpOnLogout();
+        authStore.setSession(null);
       }
     },
   });
@@ -71,7 +71,6 @@ export function useAPI() {
           const response = await fetch<unknown>(url, options);
           const validation = schema.safeParse(response);
           if (!validation.success) {
-            console.log(z.flattenError(validation.error));
             return {
               kind: 'response-parse',
               message: 'Failed to parse record response',

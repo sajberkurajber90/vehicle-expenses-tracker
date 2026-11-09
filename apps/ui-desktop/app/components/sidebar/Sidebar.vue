@@ -4,15 +4,9 @@ import SidebarItem from '~/components/sidebar/SidebarItem.vue';
 import { useAuthorizationStore } from '~/features/authorization/authorization.store';
 
 const authStore = useAuthStore();
-const authorizationStore = useAuthorizationStore();
-const { sessionRoleName } = useAuthorizationStore();
 async function logout() {
   await authStore.logout();
   await navigateTo('/login');
-  Promise.all([
-    await authStore.cleanUpOnLogout(),
-    await authorizationStore.cleanUpOnLogout(),
-  ]);
 }
 
 type TransitionState = 'shrink' | 'expanded' | 'transition';
@@ -72,9 +66,7 @@ const hover = ref(false);
       @mouseleave="() => (hover = false)"
     >
       <div class="h-full flex flex-col gap-2">
-        <div class="flex-1">
-          {{ sessionRoleName }}
-        </div>
+        <div class="flex-1"></div>
         <SidebarItem :animation-trigger="hover" :border-top="true">
           <template v-slot:icon>
             <div class="avatar avatar-placeholder flex items-center">

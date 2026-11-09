@@ -1,6 +1,4 @@
-<script setup lang="ts">
-import { useAuthorizationStore } from '~/features/authorization/authorization.store';
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="h-full flex items-center justify-center">
