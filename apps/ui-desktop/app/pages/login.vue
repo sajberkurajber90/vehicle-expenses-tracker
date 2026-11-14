@@ -7,6 +7,7 @@ type Field = 'email' | 'password';
 
 definePageMeta({
   layout: 'auth',
+  appState: 'needs-login',
 });
 
 const authStore = useAuthStore();
@@ -97,9 +98,7 @@ async function submit() {
     touchedFields[key as Field] = true;
   });
 
-  if (errorMessages.submit !== '') {
-    errorMessages.submit = '';
-  }
+  errorMessages.submit = '';
 
   const loginResponse = await login(inputForm);
   if ('id' in loginResponse) {
@@ -211,7 +210,11 @@ async function submit() {
               <p class="text-error text-xs">{{ errorMessages.submit }}</p>
             </div>
             <button
-              @click="submit"
+              @click="
+                () => {
+                  return navigateTo('/reset-password');
+                }
+              "
               class="btn btn-ghost text-xs text-primary-content/50 hover:text-primary-content/60 font-light w-full"
             >
               Forgot Password ?

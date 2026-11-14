@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { useAPI } from '~/composables/useAPI';
+import { z } from 'zod';
 
 definePageMeta({
   layout: 'auth',
+  appState: 'needs-login',
 });
 const route = useRoute();
 const { token } = route.query;
 
+const parsedToken = z.string().safeParse(token);
 const { fetch } = useAPI();
 
 const { status } = useAsyncData(() =>
   fetch('/auth/verify-email', {
     method: 'get',
     query: {
-      token: token as string,
+      token: parsedToken.success ? parsedToken.data : undefined,
     },
   }),
 );
@@ -28,7 +31,7 @@ const { status } = useAsyncData(() =>
     <div class="card w-96 bg-base-200 shadow-xl">
       <div v-if="status === 'success'" class="card-body">
         <h2 class="card-title">Email Verification</h2>
-        <p v-if="token" class="text-success">
+        <p v-if="parsedToken.success" class="text-success">
           Your email has been successfully verified. You can now log in.
         </p>
         <p v-else class="text-error">

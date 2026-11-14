@@ -110,7 +110,7 @@ export function initialSignUp(
                 user.data.user.email,
                 'Email Verification',
                 `<h2>Dear ${user.data.user.firstName}</h2>
-                            <p>Please verify your email by clicking the following link: <a href="${url}">Verify</a></p>`,
+                       <p>Please verify your email by clicking the following link: <a href="${url}">Verify</a></p>`,
               );
             } catch (e) {
               return;
@@ -120,7 +120,6 @@ export function initialSignUp(
       ],
     },
     endpoints: {
-      // TODO: instead of throwing an error try to return a proper error response with the correct status code and message
       initialSignUp: createAuthEndpoint(
         '/initial-sign-up',
         {
@@ -132,7 +131,7 @@ export function initialSignUp(
           if (!input.success) {
             throw new APIError('BAD_REQUEST', {
               message: 'Invalid request body',
-              details: input.error.flatten().fieldErrors,
+              details: z.flattenError(input.error).fieldErrors,
             });
           }
 
@@ -157,7 +156,7 @@ export function initialSignUp(
             await trx.rollback().execute();
             throw new APIError('INTERNAL_SERVER_ERROR', {
               message: 'Failed to parse better-auth sign-up response',
-              details: newUser.error.flatten().fieldErrors,
+              details: z.flattenError(newUser.error).fieldErrors,
             });
           }
 

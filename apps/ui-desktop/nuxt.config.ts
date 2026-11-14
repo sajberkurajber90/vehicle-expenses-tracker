@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     apiInternalBase: 'http://api:3000',
     public: {
       apiBase: `https://${process.env.API_PREFIX || 'api'}.${process.env.BASE_URL || 'vehicle-expenses-tracker.local'}`,
+      siteUrl: `https://${process.env.BASE_URL || 'vehicle-expenses-tracker.local'}`,
     },
   },
   vite: {

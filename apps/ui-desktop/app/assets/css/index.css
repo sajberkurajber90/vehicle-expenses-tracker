@@ -8,5 +8,7 @@
 }
 
 @utility input {
-    @apply  focus:outline-none focus:shadow-none;
+    &:focus-within {
+        @apply outline-none shadow-none;
+    }
 }

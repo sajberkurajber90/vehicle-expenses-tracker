@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+const PASSWORD_SCHEMA = z
+  .string()
+  .min(8)
+  .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
+
 // user session
 export const authUserResponseSchema = z.object({
   id: z.coerce.number(),
@@ -61,11 +66,8 @@ export type LogoutResponse = z.infer<typeof logoutResponseSchema>;
 // register app
 export const registerAppInputSchema = z.object({
   email: z.email(),
-  password: z
-    .string()
-    .min(8)
-    .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/),
-  confirmPassword: z.string(),
+  password: PASSWORD_SCHEMA,
+  confirmPassword: z.string().nonempty('Confirm password is required'),
   name: z.string(),
   firstName: z
     .string()
@@ -105,3 +107,59 @@ export const registerAppResponseSchema = z.object({
 export type RegisterAppInput = z.infer<typeof registerAppInputSchema>;
 export type RegisterAppRequest = z.infer<typeof registerAppRequestSchema>;
 export type RegisterAppResponse = z.infer<typeof registerAppResponseSchema>;
+
+// reset password
+export const resetPasswordInputSchema = z.object({
+  email: z.email().nonempty(),
+  redirectTo: z.url().nonempty(),
+});
+
+export const resetPasswordResponseSchema = z.object({
+  status: z.boolean(),
+  message: z.string(),
+});
+
+export type ResetPasswordInput = z.infer<typeof resetPasswordInputSchema>;
+export type ResetPasswordResponse = z.infer<typeof resetPasswordResponseSchema>;
+
+// confirm password
+export const confirmResetPasswordInputSchema = z.object({
+  token: z.string(),
+  newPassword: PASSWORD_SCHEMA,
+  confirmNewPassword: z.string().nonempty('Confirm new password is required'),
+});
+
+export const confirmResetPasswordInputRefineSchema =
+  confirmResetPasswordInputSchema
+    .pick({
+      newPassword: true,
+      confirmNewPassword: true,
+      token: true,
+    })
+    .refine((data) => data.newPassword === data.confirmNewPassword, {
+      message: "Passwords don't match",
+      path: ['confirmNewPassword'],
+    });
+
+export const confirmPasswordRequestSchema =
+  confirmResetPasswordInputSchema.omit({
+    confirmNewPassword: true,
+  });
+
+export const confirmResetPasswordResponseSchema = z.object({
+  status: z.boolean(),
+});
+
+export type ConfirmResetPasswordInput = z.infer<
+  typeof confirmResetPasswordInputSchema
+>;
+
+export type ConfirmResetPasswordInputRefine = z.infer<
+  typeof confirmResetPasswordInputRefineSchema
+>;
+export type ConfirmResetPasswordRequest = z.infer<
+  typeof confirmPasswordRequestSchema
+>;
+export type ConfirmResetPasswordResponse = z.infer<
+  typeof confirmResetPasswordResponseSchema
+>;

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/features/auth/auth.store';
 import SidebarItem from '~/components/sidebar/SidebarItem.vue';
-import { useAuthorizationStore } from '~/features/authorization/authorization.store';
 
 const authStore = useAuthStore();
 async function logout() {

@@ -9,6 +9,7 @@ import {
 import { authRepository } from './auth.repository.ts';
 import { authorizationRepository } from '@modules/authorization/authorization.repository.ts';
 import { signUpRequestSchema, signUpResponseSchema } from './auth.schemas.ts';
+import { sendMail } from '@infrastructure/mail/index.ts';
 
 const sharedOptions = {
   secret: process.env.BETTER_AUTH_SECRET,
@@ -24,6 +25,7 @@ const sharedOptions = {
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    revokeSessionsOnPasswordChange: true,
   },
   advanced: {
     database: {
@@ -153,7 +155,18 @@ const auth = betterAuth({
       updatedAt: 'updated_at',
     },
   },
-  emailAndPassword: sharedOptions.emailAndPassword,
+  emailAndPassword: {
+    ...sharedOptions.emailAndPassword,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      const redirectTo = `https://${process.env.BASE_URL}/verify-email/reset-password?token=${token}`;
+      await sendMail(
+        user.email,
+        'Reset your password',
+        `<h2>Dear ${user.name},</h2>
+               <p>Please verify your email by clicking the following link: <a href="${redirectTo}">Verify</a></p>`,
+      );
+    },
+  },
   emailVerification: sharedOptions.emailVerification,
   advanced: {
     crossSubDomainCookies: {

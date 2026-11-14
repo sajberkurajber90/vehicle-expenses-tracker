@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  appState: 'authenticated',
+});
+</script>
 
 <template>
   <div class="h-full flex items-center justify-center">

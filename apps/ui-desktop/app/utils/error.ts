@@ -3,6 +3,7 @@ import { FetchError } from 'ofetch';
 type BaseError = {
   message: string;
   kind:
+    | 'bad-request'
     | 'validation'
     | 'not-found'
     | 'authentication'
@@ -10,6 +11,11 @@ type BaseError = {
     | 'domain'
     | 'infrastructure'
     | 'response-parse';
+};
+
+export type BadRequest = BaseError & {
+  kind: 'bad-request';
+  message: string;
 };
 
 export type ValidationErr = BaseError & {
@@ -46,6 +52,7 @@ export type ResponseParseErr = BaseError & {
 };
 
 export type ApiError =
+  | BadRequest
   | ValidationErr
   | NotFoundErr
   | DomainErr
@@ -57,6 +64,11 @@ export type ApiError =
 export function toApiError(err: unknown): ApiError {
   if (err instanceof FetchError) {
     switch (err.statusCode) {
+      case 400:
+        return {
+          kind: 'bad-request',
+          message: err.data?.message ?? 'Bad request',
+        };
       case 401:
         return {
           kind: 'authentication',

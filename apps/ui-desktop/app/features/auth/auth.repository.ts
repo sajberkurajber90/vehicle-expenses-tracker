@@ -1,9 +1,12 @@
 import {
+  type ConfirmResetPasswordRequest,
+  type ConfirmResetPasswordResponse,
   type LoginInput,
   type LoginResponse,
   type LogoutResponse,
   type RegisterAppRequest,
   type RegisterAppResponse,
+  type ResetPasswordResponse,
 } from '~/features/auth/auth.schema';
 
 import { z } from 'zod';
@@ -19,6 +22,8 @@ export class AuthRepository {
       logoutResponseSchema: z.ZodType<LogoutResponse>;
       loginResponseSchema: z.ZodType<LoginResponse>;
       registerAppResponseSchema: z.ZodType<RegisterAppResponse>;
+      resetPasswordResponseSchema: z.ZodType<ResetPasswordResponse>;
+      confirmResetPasswordResponseSchema: z.ZodType<ConfirmResetPasswordResponse>;
     },
   ) {}
 
@@ -94,6 +99,59 @@ export class AuthRepository {
       return { data: validation.data };
     } catch (err: unknown) {
       return this.toApiError(err);
+    }
+  }
+
+  async resetPassword(
+    email: string,
+    redirectTo: string,
+  ): Promise<Result<ResetPasswordResponse> | ApiError> {
+    try {
+      const response = await this.f<unknown>('/auth/request-password-reset', {
+        method: 'POST',
+        body: { email, redirectTo },
+      });
+
+      const validation =
+        this.responseValidator.resetPasswordResponseSchema.safeParse(response);
+
+      if (!validation.success) {
+        return {
+          kind: 'response-parse',
+          message: 'Failed to parse reset password response',
+          issues: z.flattenError(validation.error).fieldErrors,
+        };
+      }
+
+      return { data: validation.data };
+    } catch (err: unknown) {
+      return this.toApiError(err);
+    }
+  }
+  async confirmResetPassword(
+    payload: ConfirmResetPasswordRequest,
+  ): Promise<Result<ConfirmResetPasswordResponse> | ApiError> {
+    try {
+      const response = await this.f<unknown>('/auth/reset-password', {
+        method: 'POST',
+        body: payload,
+      });
+      const parsedResponse =
+        this.responseValidator.confirmResetPasswordResponseSchema.safeParse(
+          response,
+        );
+
+      if (!parsedResponse.success) {
+        return {
+          kind: 'response-parse',
+          message: 'Failed to parse confirm reset password response',
+          issues: z.flattenError(parsedResponse.error).fieldErrors,
+        };
+      }
+
+      return { data: parsedResponse.data };
+    } catch (e: unknown) {
+      return this.toApiError(e);
     }
   }
 }

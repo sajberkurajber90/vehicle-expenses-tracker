@@ -7,6 +7,7 @@ type Field =
 
 definePageMeta({
   layout: 'auth',
+  appState: 'unregistered',
 });
 
 import { registerAppInputSchema } from '~/features/auth/auth.schema';
@@ -106,7 +107,7 @@ function validate(field: Field) {
       if (!passwordConformationValidation.success) {
         errorMessages.confirmPassword =
           z.flattenError(passwordConformationValidation.error).fieldErrors
-            .confirmPassword?.[0] || "Passwords don't match";
+            .password?.[0] || "Passwords don't match";
       } else {
         errorMessages.confirmPassword = '';
       }

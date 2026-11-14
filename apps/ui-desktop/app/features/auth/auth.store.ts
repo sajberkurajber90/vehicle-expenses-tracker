@@ -3,6 +3,10 @@ import { AuthService } from '~/features/auth/auth.service';
 import { AuthRepository } from '~/features/auth/auth.repository';
 import {
   type AuthUserResponse,
+  confirmPasswordRequestSchema,
+  type ConfirmResetPasswordInput,
+  confirmResetPasswordInputRefineSchema,
+  confirmResetPasswordResponseSchema,
   type LoginInput,
   loginInputSchema,
   loginResponseSchema,
@@ -11,6 +15,8 @@ import {
   registerAppInputRefineSchema,
   registerAppRequestSchema,
   registerAppResponseSchema,
+  resetPasswordInputSchema,
+  resetPasswordResponseSchema,
 } from '~/features/auth/auth.schema';
 import { toApiError } from '~/utils/error';
 
@@ -26,6 +32,8 @@ export const useAuthStore = defineStore('auth', () => {
       logoutResponseSchema,
       loginResponseSchema,
       registerAppResponseSchema,
+      resetPasswordResponseSchema,
+      confirmResetPasswordResponseSchema,
     },
   );
 
@@ -33,6 +41,9 @@ export const useAuthStore = defineStore('auth', () => {
     registerPayload: registerAppInputRefineSchema,
     registerAppRequest: registerAppRequestSchema,
     loginPayload: loginInputSchema,
+    resetPasswordPayload: resetPasswordInputSchema,
+    confirmResetPasswordPayload: confirmResetPasswordInputRefineSchema,
+    confirmResetPasswordRequest: confirmPasswordRequestSchema,
   });
 
   const sessionUser = ref<null | AuthUserResponse>(null);
@@ -80,6 +91,14 @@ export const useAuthStore = defineStore('auth', () => {
     sessionUser.value = null;
   }
 
+  async function resetPassword(email: string) {
+    return await service.resetPassword(email, config.public.siteUrl);
+  }
+
+  async function confirmResetPassword(payload: ConfirmResetPasswordInput) {
+    return await service.confirmResetPassword(payload);
+  }
+
   return {
     appRegistered,
     sessionUser,
@@ -89,5 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     cleanUpOnLogout,
+    resetPassword,
+    confirmResetPassword,
   };
 });
