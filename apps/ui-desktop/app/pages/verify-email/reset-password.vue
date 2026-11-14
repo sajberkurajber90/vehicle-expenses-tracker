@@ -173,7 +173,7 @@ async function submit() {
         <XMark />
         <div class="flex flex-col">
           <p class="text-error">Failed to verify email</p>
-          <p class="text-error">Please contact support</p>
+          <p class="text-error">Please contact support or try later</p>
         </div>
       </div>
       <form @submit.prevent v-else class="flex flex-col gap-4">
