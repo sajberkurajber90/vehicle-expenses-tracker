@@ -3,7 +3,7 @@ import { useAuthStore } from '~/features/auth/auth.store';
 import { resetPasswordInputSchema } from '~/features/auth/auth.schema';
 import { z, ZodError } from 'zod';
 import { useDelay } from '~/composables/useDelay';
-import Check from '~/components/icons/Check.vue';
+import Check from '@vehicle-expenses-tracker/ui-core/app/components/icons/Check.vue';
 
 definePageMeta({
   layout: 'auth',

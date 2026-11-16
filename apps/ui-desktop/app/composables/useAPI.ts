@@ -22,8 +22,8 @@ export function useAPI() {
     async onResponse({ response }) {
       // only on client side - for redirect purposes
       if (import.meta.client && response.status === 401) {
-        await navigateTo('/login');
         authStore.setSession(null);
+        await navigateTo('/login');
       }
     },
   });

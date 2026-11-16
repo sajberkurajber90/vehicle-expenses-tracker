@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { z, ZodError } from 'zod';
-import XMark from '~/components/icons/XMark.vue';
-import PasswordHide from '~/components/icons/PasswordHide.vue';
-import PasswordShow from '~/components/icons/PasswordShow.vue';
 import { ref } from 'vue';
 import { confirmResetPasswordInputSchema } from '~/features/auth/auth.schema';
 import { useAuthStore } from '~/features/auth/auth.store';
-import Check from '~/components/icons/Check.vue';
+import PasswordShow from '@vehicle-expenses-tracker/ui-core/app/components/icons/PasswordShow.vue';
+import PasswordHide from '@vehicle-expenses-tracker/ui-core/app/components/icons/PasswordHide.vue';
+import XMark from '@vehicle-expenses-tracker/ui-core/app/components/icons/XMark.vue';
+import Check from '@vehicle-expenses-tracker/ui-core/app/components/icons/Check.vue';
 
 definePageMeta({
   layout: 'auth',

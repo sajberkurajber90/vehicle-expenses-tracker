@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ZodError, z } from 'zod';
-import Check from '~/components/icons/Check.vue';
-import XMark from '~/components/icons/XMark.vue';
+import Check from '@vehicle-expenses-tracker/ui-core/app/components/icons/Check.vue';
+import XMark from '@vehicle-expenses-tracker/ui-core/app/components/icons/XMark.vue';
 type Field =
   'email' | 'password' | 'confirmPassword' | 'firstName' | 'lastName';
 

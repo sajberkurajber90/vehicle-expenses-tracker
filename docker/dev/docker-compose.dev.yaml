@@ -61,6 +61,11 @@ services:
               - Dockerfile.dev
               - README.md
               - .nuxt
+          - action: sync
+            path: ../../packages/ui-core/
+            target: /app/packages/ui-core
+            ignore:
+              - node_modules
           - action: rebuild
             path: ../../pnpm-lock.yaml
   ui-mobile:

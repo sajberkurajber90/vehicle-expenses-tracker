@@ -1,9 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  extends: ['@vehicle-expenses-tracker/ui-core'],
   modules: ['@pinia/nuxt'],
   runtimeConfig: {
     apiInternalBase: 'http://api:3000',
@@ -13,7 +13,6 @@ export default defineNuxtConfig({
     },
   },
   vite: {
-    plugins: [tailwindcss() as any],
     server: {
       allowedHosts: [process.env.BASE_URL || 'vehicle-expenses-tracker.local'],
       hmr: {
@@ -24,5 +23,4 @@ export default defineNuxtConfig({
       },
     },
   },
-  css: ['~/assets/css/index.css'],
 });
