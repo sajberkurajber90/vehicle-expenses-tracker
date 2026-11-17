@@ -12,7 +12,7 @@ definePageMeta({
 
 import { registerAppInputSchema } from '~/features/auth/auth.schema';
 import { useAuthStore } from '~/features/auth/auth.store';
-import { useDelay } from '~/composables/useDelay';
+import { useDelay } from '@vehicle-expenses-tracker/ui-core/app/composables/useDelay';
 
 const { delay } = useDelay();
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/features/auth/auth.store';
 import SidebarItem from '~/components/sidebar/SidebarItem.vue';
+import ToggleThema from '@vehicle-expenses-tracker/ui-core/app/components/ToggleThema.vue';
 
 const authStore = useAuthStore();
 async function logout() {
@@ -53,7 +54,7 @@ const hover = ref(false);
 <template>
   <aside class="h-full w-20 relative">
     <div
-      class="w-20 h-full absolute z-10 rounded transition-[width] duration-500 ease-in-out top-0 bg-gray-700 p-4"
+      class="w-20 h-full absolute rounded transition-[width] duration-500 ease-in-out top-0 p-4 dark:bg-amber-300 bg-gray-200"
       :class="{
         'w-20': !hover,
         'w-64': hover,
@@ -65,20 +66,22 @@ const hover = ref(false);
       @mouseleave="() => (hover = false)"
     >
       <div class="h-full flex flex-col gap-2">
-        <div class="flex-1"></div>
+        <div class="flex-1">
+          <ToggleThema :expanded="transitionState === 'expanded'" />
+        </div>
         <SidebarItem :animation-trigger="hover" :border-top="true">
           <template v-slot:icon>
-            <div class="avatar avatar-placeholder flex items-center">
-              <div class="bg-neutral w-10 rounded-full">
-                <div>TB</div>
-              </div>
+            <div
+              class="w-10 h-10 rounded-full bg-primary flex text-white justify-center items-center"
+            >
+              <div>TB</div>
             </div>
           </template>
           <template v-slot:label>
-            <Transition name="fade">
+            <Transition>
               <div
                 class="pl-2 flex justify-between items-end"
-                v-if="transitionState === 'expanded'"
+                v-show="transitionState === 'expanded'"
               >
                 <div class="text-xs">
                   {{ authStore.sessionUser?.firstName }} <br />

@@ -2,7 +2,7 @@
 import { useAuthStore } from '~/features/auth/auth.store';
 import { resetPasswordInputSchema } from '~/features/auth/auth.schema';
 import { z, ZodError } from 'zod';
-import { useDelay } from '~/composables/useDelay';
+import { useDelay } from '@vehicle-expenses-tracker/ui-core/app/composables/useDelay';
 import Check from '@vehicle-expenses-tracker/ui-core/app/components/icons/Check.vue';
 
 definePageMeta({

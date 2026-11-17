@@ -1,6 +1,18 @@
 @import "tailwindcss";
+@source "../../**/*.{vue,ts,js,jsx,tsx}";
 @plugin "daisyui" {
     themes: light --default, dark --prefersdark;
+}
+
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:not([data-theme="light"], [data-theme="light"] *)) {
+      @slot;
+    }
+  }
 }
 
 @utility btn {

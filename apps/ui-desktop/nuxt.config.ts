@@ -4,7 +4,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   extends: ['@vehicle-expenses-tracker/ui-core'],
-  modules: ['@pinia/nuxt'],
   runtimeConfig: {
     apiInternalBase: 'http://api:3000',
     public: {
@@ -20,6 +19,10 @@ export default defineNuxtConfig({
         host: process.env.BASE_URL || 'vehicle-expenses-tracker.local',
         clientPort: 443,
         path: 'hmr',
+      },
+      watch: {
+        usePolling: true,
+        interval: 1000,
       },
     },
   },

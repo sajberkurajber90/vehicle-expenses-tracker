@@ -132,6 +132,10 @@ async function submit() {
       'An unexpected error occurred. Please try again later.';
   }
 }
+
+function navigateToResetPassword() {
+  return navigateTo('/reset-password');
+}
 </script>
 
 <template>
@@ -210,11 +214,7 @@ async function submit() {
               <p class="text-error text-xs">{{ errorMessages.submit }}</p>
             </div>
             <button
-              @click="
-                () => {
-                  return navigateTo('/reset-password');
-                }
-              "
+              @click="navigateToResetPassword"
               class="btn btn-ghost text-xs text-primary-content/50 hover:text-primary-content/60 font-light w-full"
             >
               Forgot Password ?

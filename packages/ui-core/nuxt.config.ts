@@ -8,6 +8,7 @@ const currentDir = dirname(fileURLToPath(import.meta.url));
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: [join(currentDir, './app/assets/css/index.css')],
+  modules: ['@pinia/nuxt'],
   vite: {
     plugins: [tailwindcss() as any],
   },
