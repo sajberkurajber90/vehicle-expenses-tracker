@@ -1,5 +1,9 @@
 export type AppState =
-  'unregistered' | 'needs-login' | 'authenticated' | 'error';
+  | 'unregistered'
+  | 'needs-login'
+  | 'needs-user-settings'
+  | 'authenticated'
+  | 'error';
 
 type RoutePolicy = {
   redirectTo: string;
@@ -11,6 +15,9 @@ export const policies: Record<AppState, RoutePolicy> = {
   },
   'needs-login': {
     redirectTo: '/login',
+  },
+  'needs-user-settings': {
+    redirectTo: '/set-user-settings',
   },
   authenticated: {
     redirectTo: '/',

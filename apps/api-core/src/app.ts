@@ -4,6 +4,7 @@ import cors from '@fastify/cors';
 import authRoutes from '@modules/auth/auth.routes.ts';
 import dashboardRoute from '@modules/dashboard/dashboard.routes.ts';
 import authorizationRoute from '@modules/authorization/authorization.routes.ts';
+import userRoute from '@modules/app/user/user.routes.ts';
 import {
   hasZodFastifySchemaValidationErrors,
   serializerCompiler,
@@ -26,7 +27,6 @@ server
     maxAge: 86400,
   })
   .setErrorHandler((error, request, reply) => {
-    console.log('error', error);
     if (hasZodFastifySchemaValidationErrors(error)) {
       return reply.code(400).send({
         error: 'Invalid request data',
@@ -45,5 +45,6 @@ server
 server.register(authRoutes);
 server.register(authorizationRoute, { prefix: '/authorization' });
 server.register(dashboardRoute);
+server.register(userRoute, { prefix: '/user' });
 
 export default server;

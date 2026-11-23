@@ -5,45 +5,59 @@ import SystemTheme from './icons/SystemTheme.vue';
 
 const { expanded } = defineProps<{
   expanded: boolean;
+  transition: boolean;
 }>();
 const { thema, setThema } = useThema();
 </script>
 
 <template>
-  <Transition>
-    <div
-      v-show="expanded"
-      class="p-2 flex justify-center space-x-2 items-bottom"
-    >
-      <button
-        @click="setThema('light')"
-        :class="{
-          'btn-secondary': thema !== 'light',
-        }"
-        class="btn btn-circle btn-primary btn-sm"
+  <div>
+    <Transition>
+      <div v-show="expanded" class="flex justify-center space-x-2 items-bottom">
+        <button
+          @click="setThema('light')"
+          :class="{
+            'btn-secondary': thema !== 'light',
+          }"
+          class="btn btn-circle btn-primary btn-sm"
+        >
+          <LightTheme />
+        </button>
+        <button
+          @click="setThema('system')"
+          :class="{
+            'btn-secondary': thema !== 'system',
+          }"
+          class="btn btn-circle btn-primary btn-sm"
+        >
+          <SystemTheme />
+        </button>
+        <button
+          @click="setThema('dark')"
+          :class="{
+            'btn-secondary': thema !== 'dark',
+          }"
+          class="btn btn-circle btn-primary btn-sm"
+        >
+          <DarkTheme />
+        </button>
+      </div>
+    </Transition>
+    <Transition name="fade">
+      <div
+        v-show="!transition && !expanded"
+        class="flex justify-center items-center w-full"
       >
-        <LightTheme />
-      </button>
-      <button
-        @click="setThema('system')"
-        :class="{
-          'btn-secondary': thema !== 'system',
-        }"
-        class="btn btn-circle btn-primary btn-sm"
-      >
-        <SystemTheme />
-      </button>
-      <button
-        @click="setThema('dark')"
-        :class="{
-          'btn-secondary': thema !== 'dark',
-        }"
-        class="btn btn-circle btn-primary btn-sm"
-      >
-        <DarkTheme />
-      </button>
-    </div>
-  </Transition>
+        <div
+          class="w-8 h-8 bg-primary rounded-full flex justify-center items-center"
+        >
+          <DarkTheme v-show="thema === 'dark'" />
+          <LightTheme v-show="thema === 'light'" />
+          <SystemTheme v-show="thema === 'system'" />
+        </div>
+      </div>
+    </Transition>
+  </div>
 </template>
 
 <style scoped></style>

@@ -66,11 +66,15 @@ class AuthorizationService {
     Result<boolean, InfrastructureError | UnauthorizedError | NotFoundError>
   > {
     assert(
-      action !== 'create' && resourceId !== undefined && table !== undefined,
+      action === 'create' || (resourceId !== undefined && table !== undefined),
       'OwnerId and table must be provided for non-create actions',
     );
 
-    if (resourceId !== undefined && table !== undefined) {
+    if (
+      resourceId !== undefined &&
+      table !== undefined &&
+      action !== 'create'
+    ) {
       const permissionNameAll: PermissionName = `${action}.${resource}.all`;
       const all = await this.repository.hasPermission(
         sessionUserId,

@@ -13,10 +13,12 @@ import { type Database } from '@infrastructure/db/types/index.ts';
 import { UnauthorizedError } from '@modules/shared/errors.ts';
 
 function hasPermissionFactory(service: CheckPermission) {
-  return function hasPermissionHook<Params = unknown>(
+  return function hasPermissionHook<Params = unknown, Body = unknown>(
     action: PermissionAction,
     resource: PermissionResource,
-    getResourceId?: (request: FastifyRequest<{ Params: Params }>) => number,
+    getResourceId?: (
+      request: FastifyRequest<{ Params: Params; Body: Body }>,
+    ) => number,
     table?: TableExpressionOrList<Database, never>,
   ) {
     if (action === 'create') {
@@ -35,7 +37,7 @@ function hasPermissionFactory(service: CheckPermission) {
     }
 
     return async (
-      request: FastifyRequest<{ Params: Params }>,
+      request: FastifyRequest<{ Params: Params; Body: Body }>,
       reply: FastifyReply,
     ) => {
       const { id: sessionUserId } =

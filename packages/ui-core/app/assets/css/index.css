@@ -24,3 +24,9 @@
         @apply outline-none shadow-none;
     }
 }
+
+@utility select {
+  &:focus-within {
+    @apply outline-none shadow-none;
+  }
+}

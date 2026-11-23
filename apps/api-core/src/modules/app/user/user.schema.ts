@@ -12,4 +12,17 @@ export const userResponseSchema = z.object({
   deletedAt: z.coerce.date().nullable(),
 });
 
+export const createUserSettngsSchema = z.object({
+  userId: z.coerce.number().int().positive(),
+  theme: z.enum(['light', 'dark', 'system']),
+});
+
+export const updateUserSettingsSchema = createUserSettngsSchema
+  .partial()
+  .required({ userId: true });
+
 export type IUser = z.infer<typeof userResponseSchema>;
+export type CreateUserSettingsPayload = z.infer<typeof createUserSettngsSchema>;
+export type UpdateUserSettingsPayload = z.infer<
+  typeof updateUserSettingsSchema
+>;

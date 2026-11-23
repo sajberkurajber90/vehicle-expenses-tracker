@@ -215,7 +215,7 @@ function navigateToResetPassword() {
             </div>
             <button
               @click="navigateToResetPassword"
-              class="btn btn-ghost text-xs text-primary-content/50 hover:text-primary-content/60 font-light w-full"
+              class="btn text-xs btn-ghost font-light w-full"
             >
               Forgot Password ?
             </button>

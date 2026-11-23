@@ -14,12 +14,24 @@ export const permissions: RecordPermission[] = rolesConfig.map((role) => {
     case 'admin':
       return {
         role: role.name,
-        labels: ['read.role.all', 'read.permission.all'],
+        labels: [
+          'read.role.all',
+          'read.permission.all',
+          'read.user-settings.own',
+          'create.user-settings',
+          'update.user-settings.own',
+        ],
       };
     case 'user':
       return {
         role: role.name,
-        labels: ['read.role.own', 'read.permission.own'],
+        labels: [
+          'read.role.own',
+          'read.permission.own',
+          'read.user-settings.own',
+          'create.user-settings',
+          'update.user-settings.own',
+        ],
       };
     default: {
       throw new Error(`Unhandled role: ${role}`);

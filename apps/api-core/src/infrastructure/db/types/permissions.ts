@@ -9,7 +9,7 @@ import type {
 export type PermissionAction = 'create' | 'read' | 'update' | 'delete';
 export type PermissionScopedAction = Exclude<PermissionAction, 'create'>; // 'read' | 'update' | 'delete'
 export type PermissionScope = 'all' | 'own';
-export type PermissionResource = 'role' | 'permission';
+export type PermissionResource = 'role' | 'permission' | 'user-settings';
 
 export type PermissionName =
   | `create.${PermissionResource}`
@@ -17,8 +17,8 @@ export type PermissionName =
 
 export interface PermissionTable {
   id: Generated<number>;
-  name: string;
-  label: PermissionName | null;
+  name: ColumnType<PermissionName | null, PermissionName | null, never>;
+  label: ColumnType<string, string, string>;
   createdAt: ColumnType<Date, string | undefined, never>;
   updatedAt: ColumnType<Date, string | undefined, string>;
   deletedAt: ColumnType<Date | null, string | undefined, string | null>;

@@ -274,6 +274,7 @@ export class AuthorizationRepository {
           const ownershipCheck = await (trx || this.db)
             .selectFrom(table)
             .where('id', '=', resourceId)
+            .where('deletedAt', 'is', null)
             .select(['id'])
             .executeTakeFirst();
           if (ownershipCheck === undefined) {

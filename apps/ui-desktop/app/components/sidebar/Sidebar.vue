@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/features/auth/auth.store';
+import { useUserStore } from '~/features/user/user.store';
 import SidebarItem from '~/components/sidebar/SidebarItem.vue';
 import ToggleThema from '@vehicle-expenses-tracker/ui-core/app/components/ToggleThema.vue';
 
 const authStore = useAuthStore();
+const { userSettings } = storeToRefs(useUserStore());
 async function logout() {
   await authStore.logout();
   await navigateTo('/login');
@@ -54,7 +56,7 @@ const hover = ref(false);
 <template>
   <aside class="h-full w-20 relative">
     <div
-      class="w-20 h-full absolute rounded transition-[width] duration-500 ease-in-out top-0 p-4 dark:bg-amber-300 bg-gray-200"
+      class="w-20 h-full absolute rounded transition-[width] duration-500 ease-in-out top-0 p-4 bg-base-200 border-primary/50 border-2"
       :class="{
         'w-20': !hover,
         'w-64': hover,
@@ -67,7 +69,11 @@ const hover = ref(false);
     >
       <div class="h-full flex flex-col gap-2">
         <div class="flex-1">
-          <ToggleThema :expanded="transitionState === 'expanded'" />
+          <ToggleThema
+            v-show="userSettings !== null"
+            :transition="transitionState === 'transition'"
+            :expanded="transitionState === 'expanded'"
+          />
         </div>
         <SidebarItem :animation-trigger="hover" :border-top="true">
           <template v-slot:icon>
