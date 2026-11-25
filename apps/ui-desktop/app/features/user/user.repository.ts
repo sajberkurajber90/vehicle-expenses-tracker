@@ -1,6 +1,7 @@
 import type { ApiError } from '~/utils/error';
 import type {
   CreateUserSettingsInput,
+  UpdateUserSettingsInput,
   UserSettingsResponse,
 } from '~/features/user/user.schema';
 import { z } from 'zod';
@@ -41,6 +42,29 @@ export class UserRepository {
       const response = await this.f<unknown>(`/user/settings`, {
         body: payload,
         method: 'POST',
+      });
+      const parse =
+        this.responseValidator.userSettingsResponseSchema.safeParse(response);
+      if (!parse.success) {
+        return {
+          kind: 'response-parse',
+          message: 'Failed to parse user settings response',
+          issues: z.flattenError(parse.error).fieldErrors,
+        };
+      }
+      return { data: parse.data };
+    } catch (e: unknown) {
+      return this.toApiError(e);
+    }
+  }
+
+  async updateUserSettings(
+    payload: UpdateUserSettingsInput,
+  ): Promise<Result<UserSettingsResponse> | ApiError> {
+    try {
+      const response = await this.f<unknown>(`/user/settings`, {
+        body: payload,
+        method: 'PUT',
       });
       const parse =
         this.responseValidator.userSettingsResponseSchema.safeParse(response);

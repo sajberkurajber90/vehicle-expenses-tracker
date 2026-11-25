@@ -2,12 +2,23 @@
 import LightTheme from './icons/LightTheme.vue';
 import DarkTheme from './icons/DarkTheme.vue';
 import SystemTheme from './icons/SystemTheme.vue';
+import { useTheme } from '../composables/useTheme.ts';
 
 const { expanded } = defineProps<{
   expanded: boolean;
   transition: boolean;
 }>();
-const { thema, setThema } = useThema();
+
+const emit = defineEmits<{
+  (e: 'updateTheme', value: 'light' | 'dark' | 'system'): void;
+}>();
+
+function changeTheme(theme: 'light' | 'dark' | 'system') {
+  setTheme(theme);
+  emit('updateTheme', theme);
+}
+
+const { thema, setTheme } = useTheme();
 </script>
 
 <template>
@@ -15,7 +26,7 @@ const { thema, setThema } = useThema();
     <Transition>
       <div v-show="expanded" class="flex justify-center space-x-2 items-bottom">
         <button
-          @click="setThema('light')"
+          @click="changeTheme('light')"
           :class="{
             'btn-secondary': thema !== 'light',
           }"
@@ -24,7 +35,7 @@ const { thema, setThema } = useThema();
           <LightTheme />
         </button>
         <button
-          @click="setThema('system')"
+          @click="changeTheme('system')"
           :class="{
             'btn-secondary': thema !== 'system',
           }"
@@ -33,7 +44,7 @@ const { thema, setThema } = useThema();
           <SystemTheme />
         </button>
         <button
-          @click="setThema('dark')"
+          @click="changeTheme('dark')"
           :class="{
             'btn-secondary': thema !== 'dark',
           }"

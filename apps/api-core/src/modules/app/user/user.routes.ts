@@ -85,6 +85,7 @@ function userRouteFactory(
       },
       async (request, reply) => {
         const response = await service.updateUserSettings(request.body);
+        await reply.send(response.ok ? response.value : response.error);
       },
     );
 

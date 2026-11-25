@@ -4,6 +4,7 @@ import { useUserStore } from '~/features/user/user.store';
 
 export const useAppState = () => {
   const state = useState<AppState>('appstate', () => 'unregistered');
+  const transitionState = useState<boolean>('layout-transition', () => false);
 
   const { userSettings } = storeToRefs(useUserStore());
   const { sessionUser, appRegistered } = storeToRefs(useAuthStore());
@@ -11,6 +12,10 @@ export const useAppState = () => {
   const setAppState = (newState: AppState) => {
     state.value = newState;
   };
+
+  function setTransition(newState: boolean) {
+    transitionState.value = newState;
+  }
 
   const appState = computed(function () {
     if (state.value === 'error') {
@@ -34,5 +39,7 @@ export const useAppState = () => {
   return {
     appState,
     setAppState,
+    transitionState,
+    setTransition,
   };
 };

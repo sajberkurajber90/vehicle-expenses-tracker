@@ -19,7 +19,10 @@ export const createUserSettngsSchema = z.object({
 
 export const updateUserSettingsSchema = createUserSettngsSchema
   .partial()
-  .required({ userId: true });
+  .extend({
+    id: z.coerce.number().int().positive(),
+  })
+  .required({ id: true, userId: true });
 
 export type IUser = z.infer<typeof userResponseSchema>;
 export type CreateUserSettingsPayload = z.infer<typeof createUserSettngsSchema>;

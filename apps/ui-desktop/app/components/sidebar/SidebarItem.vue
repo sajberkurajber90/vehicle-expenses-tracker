@@ -9,7 +9,7 @@ const { animationTrigger = false, borderTop = false } = defineProps<{
   <div
     :class="[
       'flex items-center pt-4',
-      borderTop ? 'border-t-2 border-primary' : '',
+      borderTop ? 'border-t-2 border-primary/50' : '',
     ]"
   >
     <div

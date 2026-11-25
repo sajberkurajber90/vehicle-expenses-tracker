@@ -4,11 +4,19 @@ import { useUserStore } from '~/features/user/user.store';
 import SidebarItem from '~/components/sidebar/SidebarItem.vue';
 import ToggleThema from '@vehicle-expenses-tracker/ui-core/app/components/ToggleThema.vue';
 
-const authStore = useAuthStore();
+const { sessionUser } = storeToRefs(useAuthStore());
+const { logout: sessionLogout } = useAuthStore();
 const { userSettings } = storeToRefs(useUserStore());
+const { syncTheme } = useUserStore();
+const { setTransition } = useAppState();
+const { delay } = useDelay();
+//
 async function logout() {
-  await authStore.logout();
+  setTransition(true);
+  await sessionLogout();
+  await delay(2000);
   await navigateTo('/login');
+  setTransition(false);
 }
 
 type TransitionState = 'shrink' | 'expanded' | 'transition';
@@ -51,6 +59,16 @@ function cancelTransition() {
 }
 
 const hover = ref(false);
+
+async function toggleTheme(theme: 'light' | 'dark' | 'system') {
+  if (sessionUser.value && userSettings.value) {
+    await syncTheme({
+      id: userSettings.value.id,
+      userId: sessionUser.value.id,
+      theme,
+    });
+  }
+}
 </script>
 
 <template>
@@ -73,6 +91,7 @@ const hover = ref(false);
             v-show="userSettings !== null"
             :transition="transitionState === 'transition'"
             :expanded="transitionState === 'expanded'"
+            @update-theme="toggleTheme"
           />
         </div>
         <SidebarItem :animation-trigger="hover" :border-top="true">
@@ -90,8 +109,8 @@ const hover = ref(false);
                 v-show="transitionState === 'expanded'"
               >
                 <div class="text-xs">
-                  {{ authStore.sessionUser?.firstName }} <br />
-                  {{ authStore.sessionUser?.lastName }}
+                  {{ sessionUser?.firstName }} <br />
+                  {{ sessionUser?.lastName }}
                 </div>
                 <button class="btn btn-primary btn-xs" @click="logout">
                   Logout

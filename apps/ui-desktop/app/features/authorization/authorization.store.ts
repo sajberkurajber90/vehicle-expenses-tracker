@@ -66,7 +66,6 @@ export const useAuthorizationStore = defineStore('authorization', () => {
     sessionPermissions,
     setSessionPermissions,
     getSessionRole,
-    cleanUpOnLogout,
     sessionRoleName,
   };
 });

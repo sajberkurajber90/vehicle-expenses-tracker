@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useThema } from '@vehicle-expenses-tracker/ui-core/app/composables/useThema';
-const { thema, setThema } = useThema();
+import { useTheme } from '../../../../packages/ui-core/app/composables/useTheme';
+const { thema, setTheme } = useTheme();
 
-onBeforeUnmount(() => {
+onBeforeMount(() => {
   if (thema.value !== 'system') {
-    setThema('system');
+    setTheme('system');
   }
 });
 </script>

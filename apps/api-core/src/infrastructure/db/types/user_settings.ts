@@ -13,7 +13,7 @@ export interface UserSettingsTable {
   userId: ColumnType<number, number, never>;
   theme: ColumnType<Theme, Theme, Theme>;
   createdAt: ColumnType<Date, string | undefined, never>;
-  updatedAt: ColumnType<Date, string | undefined, string>;
+  updatedAt: ColumnType<Date, string | undefined, Date>;
 }
 
 export type InsertableUserSettings = Insertable<UserSettingsTable>;

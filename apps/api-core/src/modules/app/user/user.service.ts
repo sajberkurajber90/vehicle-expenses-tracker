@@ -13,11 +13,11 @@ export class UserService {
   }
 
   async createUserSettings(payload: CreateUserSettingsPayload) {
-    return await this.repository.createUserSettings(payload);
+    return this.repository.createUserSettings(payload);
   }
 
-  async updateUserSettings(payload: UpdateUserSettingsPayload ) {
-
+  async updateUserSettings(payload: UpdateUserSettingsPayload) {
+    return this.repository.updateUserSettings(payload);
   }
 }
 

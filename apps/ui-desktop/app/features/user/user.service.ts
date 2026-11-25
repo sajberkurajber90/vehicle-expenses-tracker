@@ -6,13 +6,13 @@ import type {
 import { z } from 'zod';
 
 export class UserService {
-  constructor(private userRepository: IUserRepository,
-              private readonly validator: {
-               createUserSettingsPayload: z.ZodType<CreateUserSettingsInput>;
-               updateUserSettingsPayload: z.ZodType<UpdateUserSettingsInput>;
-              }
-
-              ) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private readonly validator: {
+      createUserSettingsPayload: z.ZodType<CreateUserSettingsInput>;
+      updateUserSettingsPayload: z.ZodType<UpdateUserSettingsInput>;
+    },
+  ) {}
 
   async findUserSettingsByUserId(userId: number) {
     return this.userRepository.findUserSettingsByUserId(userId);
@@ -31,7 +31,7 @@ export class UserService {
     return this.userRepository.createUserSettings(payload);
   }
 
-  async updateUserSettings(payload:UpdateUserSettingsInput) {
+  async updateUserSettings(payload: UpdateUserSettingsInput) {
     const parse = this.validator.updateUserSettingsPayload.safeParse(payload);
     if (!parse.success) {
       return {
@@ -40,5 +40,6 @@ export class UserService {
         issues: z.flattenError(parse.error).fieldErrors,
       };
     }
+    return this.userRepository.updateUserSettings(payload);
   }
 }

@@ -2,6 +2,7 @@ import { useAuthStore } from '~/features/auth/auth.store';
 import {
   type CreateUserSettingsInput,
   createUserSettingsInputSchema,
+  type UpdateUserSettingsInput,
   updateUserSettingsInputSchema,
   type UserSettingsResponse,
   userSettingsResponseSchema,
@@ -51,6 +52,12 @@ export const useUserStore = defineStore('user', () => {
     return response;
   }
 
+  async function syncTheme(payload: UpdateUserSettingsInput) {
+    if (userSettings.value) {
+      const response = await service.updateUserSettings(payload);
+    }
+  }
+
   async function cleanUpOnLogout() {
     if (userSettings.value) {
       userSettings.value = null;
@@ -61,5 +68,6 @@ export const useUserStore = defineStore('user', () => {
     userSettings,
     getUserSettings,
     createUserSettings,
+    syncTheme,
   };
 });

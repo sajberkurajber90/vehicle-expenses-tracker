@@ -3,8 +3,8 @@ import { useUserStore } from '~/features/user/user.store';
 import { useAuthStore } from '~/features/auth/auth.store';
 const userStore = useUserStore();
 const { sessionUser } = storeToRefs(useAuthStore());
-import { useThema } from '@vehicle-expenses-tracker/ui-core/app/composables/useThema';
-const { thema, setThema } = useThema();
+import { useTheme } from '../../../../packages/ui-core/app/composables/useTheme';
+const { thema, setTheme } = useTheme();
 
 definePageMeta({
   layout: 'default',
@@ -37,13 +37,13 @@ async function submit() {
       <label class="select">
         <span class="label">Theme</span>
         <select class="">
-          <option @click="setThema('system')" :selected="thema === 'system'">
+          <option @click="setTheme('system')" :selected="thema === 'system'">
             System
           </option>
-          <option @click="setThema('light')" :selected="thema === 'light'">
+          <option @click="setTheme('light')" :selected="thema === 'light'">
             Light
           </option>
-          <option @click="setThema('dark')" :selected="thema === 'dark'">
+          <option @click="setTheme('dark')" :selected="thema === 'dark'">
             Dark
           </option>
         </select>

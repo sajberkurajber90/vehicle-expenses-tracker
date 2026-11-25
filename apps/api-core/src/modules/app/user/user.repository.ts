@@ -109,12 +109,14 @@ export class UserRepository {
     trx?: Kysely<Database>,
   ) {
     try {
-      const { userId, ...updateFields } = payload;
+      const { id, userId, ...updateFields } = payload;
       const response = await (trx || this.db)
         .updateTable('user_settings')
         .set({
           ...updateFields,
+          updatedAt: new Date(),
         })
+        .where('id', '=', id)
         .where('userId', '=', userId)
         .returningAll()
         .executeTakeFirst();
