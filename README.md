@@ -1,7 +1,10 @@
 # Vehicle Expenses Tracker
 
 
-<div style="padding: 1cm; font-weight: bold; font-size: large; text-align: center;background-color: darkslateblue;"> Under construction</div>
+---
+**Under Construction - This project is still in development and not yet ready for production use.**
+
+---
 
 A simple application to track and manage vehicle-related expenses (fuel, maintenance, insurance etc.) for individual use.
 
@@ -32,5 +35,7 @@ Monorepo (in future Turborepo or Nx)
    - generates SSL certificates  
    - adds urls to etc/hosts
    - installs dependencies
- 4. run `docker compose -f docker/dev/docker-compose.dev.yaml --env-file .env watch` to start the development environment with enabled hot reload for backend and frontend
+ 4. Run `docker compose -f docker/dev/docker-compose.dev.yaml --env-file .env watch` to start the development environment with enabled hot reload for backend and frontend
+ 5. Migrate the database with `pnpm api:db:migrate` command
+ 6. Run `pnpm api:permissions:seed` to seed the database with roles and permissions
 
