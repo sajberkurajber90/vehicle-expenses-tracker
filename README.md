@@ -36,4 +36,6 @@ Monorepo (in future Turborepo or Nx)
    - adds urls to etc/hosts
    - installs dependencies
  4. run `docker compose -f docker/dev/docker-compose.dev.yaml --env-file .env watch` to start the development environment with enabled hot reload for backend and frontend
+ 5. migrate the database with `pnpm api:db:migrate` command
+ 6. run `pnpm api:permissions:seed` to seed the database with roles and permissions
 
