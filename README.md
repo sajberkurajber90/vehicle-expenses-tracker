@@ -1,7 +1,10 @@
 # Vehicle Expenses Tracker
 
 
-<div style="padding: 1cm; font-weight: bold; font-size: large; text-align: center;background-color: darkslateblue;"> Under construction</div>
+---
+**Under Construction - This project is still in development and not yet ready for production use.**
+
+---
 
 A simple application to track and manage vehicle-related expenses (fuel, maintenance, insurance etc.) for individual use.
 
